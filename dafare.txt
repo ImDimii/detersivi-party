@@ -1,0 +1,733 @@
+
+████████████████████████████████████████████████████████████████████████████████
+██                                                                            ██
+██              BRIEF DI PROGETTO — SITO WEB E-COMMERCE LOCALE               ██
+██                                                                            ██
+██   Cliente   : [Nome Negozio]                                               ██
+██   Data      : 22 Marzo 2026                                                ██
+██   Versione  : 1.0                                                          ██
+██   Preparato : Dimitri Cotilli                                              ██
+██                                                                            ██
+████████████████████████████████████████████████████████████████████████████████
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  INDICE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  1.  Panoramica del Progetto
+  2.  Obiettivi
+  3.  Stack Tecnologico
+  4.  Design & Identità Visiva
+  5.  Architettura del Sito (Pagine & Sezioni)
+  6.  Funzionalità — Catalogo Prodotti
+  7.  Funzionalità — Sistema Ordini Locali
+  8.  Funzionalità — Sistema Prenotazioni
+  9.  Funzionalità — Area Clienti (Account)
+  10. Funzionalità — Notifiche & Comunicazioni
+  11. Funzionalità — SEO & Performance
+  12. Pannello Admin — Specifiche Complete
+  13. Database — Schema Supabase
+  14. Sicurezza & Accessi
+  15. Integrazioni Esterne
+  16. MVP vs Fase 2
+  17. Deliverable & Consegne
+  18. Note Finali & Contatti Cliente
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  1. PANORAMICA DEL PROGETTO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Realizzazione di un sito web completo per un negozio fisico locale che opera
+in due macro-categorie merceologiche:
+
+  › Prodotti per la casa e igiene
+    Detersivi, detergenti, prodotti per pulizia ambienti, igiene personale,
+    profumatori, disinfettanti, monouso domestico, ecc.
+
+  › Articoli per feste e party
+    Addobbi, palloncini, accessori per tavola, cotillons, articoli a tema,
+    decorazioni per compleanni, matrimoni, lauree, ecc.
+
+Il sito dovrà essere sia una vetrina digitale del negozio (brand identity,
+catalogo, presenza online) che uno strumento operativo reale per gestire
+ordini locali, prenotazioni, clienti fidelizzati e comunicazioni.
+
+Bacino d'utenza: prevalentemente locale/regionale.
+Pagamenti: esclusivamente in negozio (contanti, POS) — nessun gateway online.
+Lingue: Italiano (principale). Opzionale: inglese in fase 2.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  2. OBIETTIVI
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  [BUSINESS]
+  ► Aumentare la visibilità online del negozio fisico nella zona locale
+  ► Permettere ai clienti di ordinare prodotti online e ritirarli/riceverli
+  ► Ridurre il carico operativo manuale (telefonate per ordini/prenotazioni)
+  ► Costruire una base clienti fidelizzata tramite account personali
+  ► Gestire in modo efficiente allestimenti e prenotazioni party
+
+  [TECNICO]
+  ► Sito performante, accessibile, SEO-friendly
+  ► Pannello admin intuitivo, usabile da personale non tecnico
+  ► Architettura scalabile per aggiungere funzionalità in futuro
+  ► Codebase pulita e manutenibile, consegnata su repo GitHub
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  3. STACK TECNOLOGICO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  FRONTEND
+  ┌─────────────────────┬────────────────────────────────────────────────────┐
+  │ Framework           │ Next.js 15 (App Router, React Server Components)   │
+  │ Styling             │ TailwindCSS v4 + CSS Variables per theming         │
+  │ Componenti UI       │ shadcn/ui (base) + componenti custom               │
+  │ Animazioni          │ Framer Motion (micro-interazioni leggere)          │
+  │ Icone               │ Lucide React                                       │
+  │ Form Handling       │ React Hook Form + Zod (validazione schema)         │
+  │ State Management    │ Zustand (carrello, UI state)                       │
+  │ Date/Calendar       │ React Day Picker + date-fns                        │
+  └─────────────────────┴────────────────────────────────────────────────────┘
+
+  BACKEND / INFRASTRUTTURA
+  ┌─────────────────────┬────────────────────────────────────────────────────┐
+  │ BaaS                │ Supabase (PostgreSQL, Auth, Storage, Realtime)     │
+  │ API Routes          │ Next.js Route Handlers (server-side logic)         │
+  │ Email               │ Resend (transazionali) + React Email (template)    │
+  │ Upload immagini     │ Supabase Storage (con CDN)                        │
+  │ Deploy              │ Vercel (ottimizzato per Next.js)                   │
+  │ Variabili env       │ Vercel Environment Variables                       │
+  └─────────────────────┴────────────────────────────────────────────────────┘
+
+  SVILUPPO & TOOLING
+  ┌─────────────────────┬────────────────────────────────────────────────────┐
+  │ Package Manager     │ pnpm                                               │
+  │ Linting             │ ESLint + Prettier                                  │
+  │ Type Safety         │ TypeScript (strict mode)                           │
+  │ Versioning          │ Git + GitHub (repo privato)                        │
+  └─────────────────────┴────────────────────────────────────────────────────┘
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  4. DESIGN & IDENTITÀ VISIVA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+FILOSOFIA VISIVA
+  Minimal • Moderno • Versatile
+  Il design deve comunicare pulizia, professionalità e fiducia. Nessun
+  elemento superfluo: ogni componente visivo ha una funzione. L'estetica
+  deve funzionare sia per prodotti "domestici/pratici" che per articoli
+  festosi/colorati senza risultare in conflitto.
+
+PALETTE COLORI (da finalizzare con il cliente)
+  Background primario : #FFFFFF / #FAFAFA (bianco/off-white)
+  Testo primario      : #111111 (quasi nero, non puro)
+  Accento primario    : da definire (es. verde salvia, blu slate, terracotta)
+  Accento secondario  : versione più chiara dell'accento
+  Bordi/separatori    : #E5E7EB (grigio chiarissimo)
+  Errore              : #EF4444
+  Successo            : #22C55E
+  Supporto dark mode  : sì (CSS Variables per swap automatico)
+
+TIPOGRAFIA
+  Heading : Geist (o Inter Display) — bold, tracking stretto
+  Body    : Inter — regular/medium, line-height generoso
+  Mono    : Geist Mono (per codici ordine, riferimenti)
+
+PRINCIPI UI
+  › Spazi bianchi generosi — breathing room tra elementi
+  › Border radius consistente (4–8px per card, 999px per badge/pill)
+  › Ombre sottili e diffuse (no drop-shadow aggressivo)
+  › Hover states fluidi (transizione 150–200ms ease)
+  › Focus ring visibile per accessibilità (WCAG 2.1 AA)
+  › Immagini prodotti su sfondo neutro, proporzione 1:1 o 4:3
+  › Skeleton loading per contenuti asincroni
+
+COMPONENTI CHIAVE
+  › Card prodotto con hover lift effect
+  › Badge categoria colorato (pill)
+  › Toast notification per feedback azioni
+  › Modal/sheet per dettaglio prodotto e conferme
+  › Sidebar filtri con checkbox e slider prezzo
+  › Step indicator per processo ordine
+  › Calendar picker per prenotazioni
+  › Status badge per stato ordini (colorato per stato)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  5. ARCHITETTURA DEL SITO — PAGINE & SEZIONI
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+STRUTTURA URL
+  /                          → Home
+  /catalogo                  → Catalogo completo
+  /catalogo/[categoria]      → Catalogo filtrato per categoria
+  /prodotto/[slug]           → Scheda prodotto singolo
+  /ordine                    → Carrello e processo ordine
+  /ordine/conferma/[id]      → Pagina conferma ordine
+  /prenota                   → Sistema prenotazioni
+  /prenota/conferma/[id]     → Conferma prenotazione
+  /account                   → Dashboard cliente (protetto)
+  /account/ordini            → Storico ordini cliente
+  /account/prenotazioni      → Storico prenotazioni cliente
+  /account/profilo           → Gestione profilo
+  /login                     → Login / Registrazione
+  /contatti                  → Pagina contatti
+  /chi-siamo                 → Storia e valori del negozio
+  /offerte                   → Prodotti in promozione
+  /admin                     → Pannello admin (protetto, ruolo admin)
+  /admin/prodotti            → Gestione prodotti
+  /admin/ordini              → Gestione ordini
+  /admin/prenotazioni        → Gestione prenotazioni
+  /admin/clienti             → Gestione clienti
+  /admin/impostazioni        → Configurazione sito
+
+━━━━━━━━━━━━━━━
+  HOME PAGE  /
+━━━━━━━━━━━━━━━
+  HERO SECTION
+  › Headline + subheadline del negozio
+  › Immagine/video background (Supabase Storage)
+  › Due CTA principali: "Sfoglia il Catalogo" / "Prenota un Allestimento"
+  › Indicatore scroll animato
+
+  CATEGORIE IN EVIDENZA
+  › Grid 2 colonne: Prodotti Casa & Igiene / Articoli Festa
+  › Card categoria con immagine, nome e link
+
+  PRODOTTI IN EVIDENZA
+  › Carousel o grid 4 prodotti "featured" (gestibili da admin)
+  › Card con foto, nome, prezzo, pulsante aggiunta carrello diretto
+
+  OFFERTE ATTIVE
+  › Banner o sezione con prodotti in sconto (se presenti)
+  › Countdown timer opzionale per offerte a tempo
+
+  SEZIONE "PERCHÉ SCEGLIERCI"
+  › 3–4 punti di forza con icona + testo (es. Consegna locale, Qualità,
+    Assistenza, Allestimenti su misura)
+
+  TESTIMONIANZE CLIENTI
+  › Carousel con recensioni clienti (gestibili da admin)
+  › Nome, stelle (1–5), testo, data
+
+  SEZIONE PRENOTAZIONI RAPIDA
+  › Teaser del servizio allestimenti party
+  › CTA "Prenota Ora" → link a /prenota
+
+  FOOTER
+  › Logo + breve descrizione
+  › Link rapidi (Catalogo, Prenota, Contatti, Chi Siamo)
+  › Orari di apertura
+  › Indirizzo con link Google Maps
+  › Social media links
+  › Copyright + P.IVA
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  6. FUNZIONALITÀ — CATALOGO PRODOTTI
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+STRUTTURA CATALOGO
+  › Categorie principali (es. Detersivi, Igiene Casa, Articoli Festa, Monouso)
+  › Sottocategorie (es. Detersivi → Bucato / Pavimenti / Stoviglie)
+  › Tag prodotto (es. "eco-friendly", "in offerta", "novità", "più venduto")
+  › Prodotti con varianti (es. formato 1L / 5L, colore addobbo)
+
+FILTRI & RICERCA
+  › Ricerca full-text per nome prodotto (Supabase Full Text Search)
+  › Filtro per categoria e sottocategoria
+  › Filtro per fascia di prezzo (slider range)
+  › Filtro per disponibilità (solo disponibili)
+  › Filtro per tag (es. "in offerta", "eco")
+  › Ordinamento: prezzo crescente/decrescente, novità, più venduto
+  › Numero risultati per pagina + paginazione
+
+SCHEDA PRODOTTO (/prodotto/[slug])
+  › Galleria immagini (principale + thumbnail laterali, max 6 foto)
+  › Nome prodotto, SKU/codice interno
+  › Descrizione breve (visibile) + descrizione estesa (accordion)
+  › Prezzo (con eventuale prezzo barrato se in offerta)
+  › Badge disponibilità (Disponibile / Disponibilità limitata / Esaurito)
+  › Selezione variante (es. formato, colore) — se applicabile
+  › Quantità selezionabile + pulsante "Aggiungi al Carrello"
+  › Sezione "Prodotti correlati" (stessa categoria, 4 prodotti)
+  › Breadcrumb navigazione
+  › Schema markup JSON-LD per SEO prodotto
+
+GESTIONE DISPONIBILITÀ
+  › Stock per prodotto (quantità numerica)
+  › Flag "disponibile su ordinazione"
+  › Avviso automatico admin quando stock < soglia configurabile
+  › Prodotti esauriti non ordinabili (pulsante disabilitato)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  7. FUNZIONALITÀ — SISTEMA ORDINI LOCALI
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CARRELLO
+  › Sidebar/drawer carrello accessibile da qualsiasi pagina
+  › Aggiunta, rimozione, modifica quantità prodotti
+  › Riepilogo prezzi (subtotale, spese consegna, totale)
+  › Persistenza carrello in localStorage (anche senza login)
+  › Merge carrello guest → account al login
+  › Indicatore numero prodotti nell'icona carrello (header)
+
+PROCESSO ORDINE (step-by-step)
+  STEP 1 — Riepilogo Carrello
+    › Lista prodotti con foto, nome, quantità, prezzo
+    › Modifica quantità / rimozione inline
+    › Codice sconto (opzionale, fase 2)
+
+  STEP 2 — Dati Cliente & Modalità
+    › Se loggato: dati precompilati dal profilo
+    › Se guest: form con nome, cognome, telefono, email
+    › Scelta modalità:
+        [A] RITIRO IN NEGOZIO
+            - Scelta data/ora preferita ritiro (slot disponibili)
+            - Note aggiuntive
+        [B] CONSEGNA A DOMICILIO (solo zona locale)
+            - Indirizzo completo (via, civico, comune, CAP)
+            - Verifica CAP: se fuori zona, avviso "non disponibile"
+            - Fascia oraria preferita consegna
+            - Note al corriere/consegnatore
+    › Checkbox accettazione privacy policy
+
+  STEP 3 — Conferma & Riepilogo
+    › Riepilogo completo ordine prima dell'invio
+    › Metodo pagamento: solo "Pagamento in negozio/alla consegna"
+    › Pulsante "Conferma Ordine"
+
+  STEP 4 — Ordine Confermato
+    › Pagina di ringraziamento con numero ordine
+    › Invio email conferma al cliente (template brandizzato)
+    › Notifica email/push all'admin per nuovo ordine
+    › Se loggato: ordine salvato nell'account cliente
+
+GESTIONE ORDINE LATO CLIENTE
+  › Visualizzazione stato ordine in tempo reale (Supabase Realtime)
+  › Stati: Ricevuto → In preparazione → Pronto per ritiro/In consegna → Completato
+  › Email automatica a ogni cambio stato
+  › Possibilità di aggiungere note post-ordine (solo stato "Ricevuto")
+  › Storico ordini nell'area personale
+
+CODICI SCONTO (Fase 2)
+  › Creazione codici dall'admin (percentuale o valore fisso)
+  › Validità temporale e limite utilizzi
+  › Applicazione al checkout
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  8. FUNZIONALITÀ — SISTEMA PRENOTAZIONI
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TIPOLOGIE DI PRENOTAZIONE
+  › Consulenza Allestimento (in negozio o a domicilio)
+  › Allestimento Festa Completo (servizio con materiali inclusi)
+  › Ritiro Ordine Programmato (per ordini voluminosi)
+  › Personalizzato (tipo libero, con note)
+
+PAGINA PRENOTAZIONE (/prenota)
+  › Descrizione del servizio con esempi/foto
+  › Selezione tipo prenotazione (card selezionabili)
+  › Calendario disponibilità:
+      - Date non disponibili bloccate (gestibili da admin)
+      - Slot orari configurabili per giorno della settimana
+      - Max prenotazioni per slot (es. max 2 contemporaneamente)
+  › Form dati:
+      - Nome, Cognome, Telefono, Email
+      - Tipo evento (compleanno, matrimonio, laurea, aziendale, altro)
+      - Numero di persone previste (range)
+      - Budget indicativo (opzionale)
+      - Note/richieste specifiche (textarea)
+  › Upload foto/reference opzionale (Supabase Storage)
+  › Riepilogo prenotazione prima della conferma
+
+CONFERMA E GESTIONE
+  › Email conferma automatica al cliente con dettagli slot
+  › Email notifica all'admin per nuova prenotazione
+  › Admin può: Accettare / Rifiutare (con motivo) / Spostare / Completare
+  › Email automatica al cliente per cambio stato
+  › Possibilità di cancellazione da parte del cliente (entro X ore — configurabile)
+  › Integrazione Google Calendar (Fase 2): evento creato all'accettazione
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  9. FUNZIONALITÀ — AREA CLIENTI (ACCOUNT)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+AUTENTICAZIONE (Supabase Auth)
+  › Registrazione con email + password
+  › Login con email + password
+  › Recupero password via email
+  › Opzionale: login con Google OAuth (Fase 2)
+  › Verifica email obbligatoria alla registrazione
+  › Sessione persistente (remember me)
+
+DASHBOARD CLIENTE (/account)
+  › Benvenuto con nome cliente
+  › Riepilogo rapido: ultimi ordini, prenotazioni prossime
+  › Accesso rapido alle sezioni
+
+STORICO ORDINI (/account/ordini)
+  › Lista ordini con numero, data, stato, totale
+  › Filtro per stato e periodo
+  › Dettaglio ordine espandibile: prodotti, indirizzo, note
+  › Tracking stato in tempo reale
+  › Download riepilogo ordine (PDF — Fase 2)
+
+PRENOTAZIONI (/account/prenotazioni)
+  › Lista prenotazioni con data, tipo, stato
+  › Dettaglio prenotazione
+  › Pulsante cancellazione (se entro limite orario)
+
+PROFILO (/account/profilo)
+  › Modifica nome, cognome, telefono
+  › Gestione indirizzi salvati (principale + secondari)
+  › Cambio password
+  › Preferenze comunicazioni (email ordini, newsletter)
+  › Eliminazione account (con conferma)
+
+PROGRAMMA FEDELTÀ (Fase 2)
+  › Punti accumulati per ogni ordine (es. 1€ = 1 punto)
+  › Soglie premio (es. 100 punti = 5€ sconto)
+  › Storico punti nell'account
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  10. FUNZIONALITÀ — NOTIFICHE & COMUNICAZIONI
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+EMAIL TRANSAZIONALI (Resend + React Email)
+  Template brandizzati per:
+  › Conferma registrazione account (con link verifica)
+  › Conferma ordine (riepilogo prodotti, numero ordine, istruzioni)
+  › Aggiornamento stato ordine (per ogni cambio stato)
+  › Conferma prenotazione (dettagli slot, indirizzo, istruzioni)
+  › Aggiornamento stato prenotazione (accettata/rifiutata)
+  › Reset password
+  › Promozioni e newsletter (opzionale, iscrizione nel footer)
+
+NOTIFICHE ADMIN
+  › Email immediata per nuovo ordine (con riepilogo)
+  › Email immediata per nuova prenotazione
+  › Email giornaliera/settimanale con digest ordini (configurabile)
+  › Badge in-app nel pannello admin (Supabase Realtime)
+
+WHATSAPP BUSINESS (Fase 2)
+  › Messaggio automatico conferma ordine su WhatsApp cliente
+  › Template preapprovati Meta Business API
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  11. SEO & PERFORMANCE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SEO
+  › Metadata dinamici per ogni pagina (Next.js Metadata API)
+  › Open Graph + Twitter Card per condivisioni social
+  › Sitemap.xml generata automaticamente
+  › robots.txt configurato
+  › Schema markup JSON-LD:
+      - LocalBusiness (negozio fisico con orari, indirizzo, telefono)
+      - Product (scheda prodotto con prezzo e disponibilità)
+      - BreadcrumbList
+  › URL slug human-readable per prodotti e categorie
+  › Canonical URL per pagine duplicate
+  › SEO locale: NAP consistente (Nome, Indirizzo, Telefono) su tutto il sito
+
+PERFORMANCE
+  › Next.js Image Optimization (next/image) per tutte le immagini
+  › Lazy loading componenti non critici
+  › Server Components per rendering statico dove possibile
+  › Caching Supabase queries (Next.js fetch cache)
+  › Bundle splitting automatico Next.js
+  › Target: Lighthouse Score ≥ 90 su tutte le categorie
+
+ACCESSIBILITÀ
+  › WCAG 2.1 AA compliance
+  › Aria labels su elementi interattivi
+  › Contrasto colori verificato
+  › Navigazione da tastiera funzionante
+  › Focus management nei modal/drawer
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  12. PANNELLO ADMIN — SPECIFICHE COMPLETE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Accesso: /admin (solo utenti con ruolo "admin" in Supabase)
+UI: sidebar + header con breadcrumb, design coerente con il sito pubblico
+
+  [DASHBOARD /admin]
+  › KPI cards: ordini oggi, prenotazioni settimana, prodotti attivi, clienti totali
+  › Grafico ordini ultimi 30 giorni (line chart)
+  › Lista ultimi 5 ordini (con link al dettaglio)
+  › Lista prossime 5 prenotazioni
+  › Avvisi: prodotti con stock basso, prenotazioni in attesa
+
+  [PRODOTTI /admin/prodotti]
+  › Lista prodotti con foto thumbnail, nome, categoria, prezzo, stock, stato
+  › Filtri: categoria, stato (attivo/disattivo), stock
+  › Ricerca per nome/SKU
+  › Azioni rapide: attiva/disattiva, elimina
+  › Form aggiunta/modifica prodotto:
+      - Nome, slug (auto-generato da nome, modificabile)
+      - Descrizione breve e descrizione estesa (editor rich text — TipTap)
+      - Categoria (dropdown) + sottocategoria
+      - Prezzo + prezzo di listino (barrato)
+      - SKU / Codice interno
+      - Stock disponibile + soglia avviso stock
+      - Flag: in evidenza, novità, eco-friendly
+      - Upload immagini (drag & drop, max 6, riordino con drag)
+      - Varianti prodotto (nome variante + opzioni con prezzo delta)
+      - Stato: pubblicato / bozza / archiviato
+
+  [CATEGORIE /admin/categorie]
+  › Gestione albero categorie/sottocategorie
+  › Nome, slug, immagine copertina, ordine visualizzazione
+
+  [ORDINI /admin/ordini]
+  › Lista ordini con: numero, data, cliente, importo, modalità, stato
+  › Filtri: stato, modalità (ritiro/consegna), periodo, ricerca cliente
+  › Dettaglio ordine:
+      - Prodotti ordinati con quantità e prezzi
+      - Dati cliente (nome, telefono, email)
+      - Indirizzo consegna (se applicabile)
+      - Note cliente
+      - Storico stati con timestamp
+  › Cambio stato ordine con dropdown + nota interna opzionale
+  › Invio email manuale al cliente
+  › Export ordini CSV per periodo selezionato
+
+  [PRENOTAZIONI /admin/prenotazioni]
+  › Vista calendario (mensile/settimanale) + vista lista
+  › Card prenotazione: nome cliente, tipo evento, data/ora, stato
+  › Filtri: tipo, stato, periodo
+  › Dettaglio prenotazione:
+      - Tutti i dati inseriti dal cliente
+      - Allegati (foto reference se caricati)
+  › Azioni: Accetta / Rifiuta (con messaggio) / Sposta slot / Completa
+  › Configurazione disponibilità:
+      - Giorni lavorativi e orari
+      - Slot orari per tipo prenotazione
+      - Blocco date specifiche (festivi, chiusure)
+      - Max prenotazioni per slot
+
+  [CLIENTI /admin/clienti]
+  › Lista clienti registrati con: nome, email, data registrazione, n° ordini
+  › Dettaglio cliente: dati profilo, storico ordini, prenotazioni
+  › Ricerca per nome/email
+  › Esporta lista clienti CSV
+
+  [OFFERTE & PROMO /admin/offerte]
+  › Impostazione prezzo scontato su prodotti singoli o categoria
+  › Configurazione banner homepage
+  › Gestione tag prodotti (novità, in evidenza, ecc.)
+
+  [IMPOSTAZIONI /admin/impostazioni]
+  › Dati negozio (nome, indirizzo, P.IVA, telefono, email, social)
+  › Orari apertura (per ogni giorno della settimana)
+  › Zone di consegna (lista CAP abilitati) + costo/soglia gratuita
+  › Fasce orarie ritiro
+  › Configurazione email (mittente, firma)
+  › Testo pagine statiche (Chi Siamo — WYSIWYG)
+  › Gestione admin: lista utenti con ruolo admin, aggiunta nuovo admin
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  13. DATABASE — SCHEMA SUPABASE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Tutte le tabelle hanno: id (uuid), created_at, updated_at
+Row Level Security (RLS) abilitato su tutte le tabelle.
+
+  categories
+  ├── id, name, slug, description, image_url
+  ├── parent_id (FK → categories, per sottocategorie)
+  └── sort_order, is_active
+
+  products
+  ├── id, name, slug, description_short, description_long
+  ├── price, price_original (nullable, per sconto)
+  ├── sku, stock_quantity, stock_alert_threshold
+  ├── category_id (FK → categories)
+  ├── images (jsonb: array di url)
+  ├── variants (jsonb: [{name, options:[{label, price_delta}]}])
+  ├── tags (text[]: array di tag)
+  └── is_featured, is_new, status (published/draft/archived)
+
+  orders
+  ├── id, order_number (es. ORD-2026-0042)
+  ├── user_id (FK → auth.users, nullable per guest)
+  ├── customer_name, customer_email, customer_phone
+  ├── type (pickup | delivery)
+  ├── delivery_address (jsonb: {street, city, zip, notes})
+  ├── pickup_slot (timestamp, nullable)
+  ├── status (received | preparing | ready | delivering | completed | cancelled)
+  ├── subtotal, delivery_fee, total
+  ├── discount_code, discount_amount
+  ├── customer_notes, internal_notes
+  └── status_history (jsonb: [{status, changed_at, note}])
+
+  order_items
+  ├── id, order_id (FK → orders)
+  ├── product_id (FK → products)
+  ├── product_name (snapshot al momento ordine)
+  ├── variant_label (nullable)
+  ├── quantity, unit_price, total_price
+
+  reservations
+  ├── id, reservation_number
+  ├── user_id (FK → auth.users, nullable)
+  ├── customer_name, customer_email, customer_phone
+  ├── type (consultation | full_setup | pickup | custom)
+  ├── event_type (birthday | wedding | graduation | corporate | other)
+  ├── event_date, slot_start, slot_end
+  ├── guests_count, budget_range
+  ├── notes, attachments (text[], url file su storage)
+  ├── status (pending | confirmed | rejected | completed | cancelled)
+  └── admin_notes, rejection_reason
+
+  availability_blocks
+  ├── id, date, slot_start, slot_end
+  └── reason, is_recurring
+
+  reviews
+  ├── id, product_id (FK → products)
+  ├── user_id (FK → auth.users)
+  ├── rating (1–5), title, body
+  └── is_approved, is_verified_purchase
+
+  discount_codes
+  ├── id, code, type (percentage | fixed)
+  ├── value, min_order_amount
+  ├── valid_from, valid_until
+  └── max_uses, uses_count, is_active
+
+  site_settings
+  └── key (text, PK), value (jsonb)
+
+  STORAGE BUCKETS
+  › product-images    (pubblico, immagini prodotti)
+  › reservation-attachments (privato, allegati prenotazioni)
+  › site-assets       (pubblico, loghi, banner, ecc.)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  14. SICUREZZA & ACCESSI
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  › Supabase RLS: politiche per utente autenticato, guest e admin
+  › Middleware Next.js per protezione route /admin e /account
+  › Variabili sensibili solo su server-side (SUPABASE_SERVICE_ROLE_KEY mai esposta)
+  › Validazione Zod su tutti i form (client + server)
+  › Rate limiting su API Route Handlers critiche (ordini, auth)
+  › HTTPS obbligatorio (Vercel gestisce SSL automaticamente)
+  › Input sanitization per prevenire XSS e injection
+  › Cookie HttpOnly per sessioni
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  15. INTEGRAZIONI ESTERNE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  MVP
+  › Resend          — Email transazionali
+  › Google Maps     — Embed mappa nella pagina Contatti
+  › Vercel          — Hosting e deploy CI/CD
+
+  FASE 2
+  › Google Analytics 4   — Tracking visite e conversioni
+  › WhatsApp Business API — Notifiche ordini su WhatsApp
+  › Google Calendar API   — Sync prenotazioni su calendario admin
+  › Google OAuth          — Login social per clienti
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  16. MVP vs FASE 2
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ✅ MVP — INCLUSO NELLA PRIMA RELEASE
+  ─────────────────────────────────────
+  ▸ Home page completa con tutte le sezioni
+  ▸ Catalogo prodotti con filtri e ricerca
+  ▸ Scheda prodotto con varianti e stock
+  ▸ Carrello e processo ordine completo (ritiro + consegna locale)
+  ▸ Email conferma ordine al cliente e notifica admin
+  ▸ Tracking stato ordine in tempo reale
+  ▸ Sistema prenotazioni con calendario e slot
+  ▸ Email automatiche per prenotazioni
+  ▸ Area account cliente (storico ordini, prenotazioni, profilo)
+  ▸ Pannello admin completo (prodotti, ordini, prenotazioni, impostazioni)
+  ▸ SEO base (metadata, sitemap, schema markup)
+  ▸ Design responsive mobile-first
+  ▸ Dark mode
+  ▸ Pagine statiche: Chi Siamo, Contatti
+
+  🔜 FASE 2 — SVILUPPI FUTURI
+  ─────────────────────────────
+  ▸ Google OAuth (login con Google)
+  ▸ WhatsApp Business API per notifiche
+  ▸ Codici sconto e promozioni
+  ▸ Programma fedeltà punti
+  ▸ Google Calendar sync per prenotazioni
+  ▸ PDF riepilogo ordine scaricabile
+  ▸ Google Analytics 4
+  ▸ Newsletter con sistema di iscrizione
+  ▸ Multilingua (IT + EN)
+  ▸ Download fattura semplificata
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  17. DELIVERABLE & CONSEGNE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  › Repository GitHub privato con codebase completa
+  › Progetto Supabase configurato con schema DB, RLS e storage
+  › Progetto Vercel collegato al repo con deploy automatico su push main
+  › File .env.example documentato con tutte le variabili necessarie
+  › Documento README con istruzioni setup locale e deploy
+  › Credenziali admin iniziali (da cambiare al primo accesso)
+  › Breve guida testuale all'uso del pannello admin
+
+  NOTE SUL PROCESSO
+  › Deploy preview automatico per ogni PR (Vercel)
+  › Branch main = produzione; branch develop = staging
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  18. NOTE FINALI & CONTATTI CLIENTE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PAGAMENTI
+  Il sito NON integra alcun gateway di pagamento online.
+  Tutti gli ordini vengono pagati direttamente in negozio (contanti o POS)
+  al momento del ritiro, o alla consegna a domicilio.
+
+ACCESSIBILITÀ ADMIN
+  Il pannello admin deve essere utilizzabile da personale non tecnico.
+  Si richiede un'interfaccia chiara, con labeling esplicito, conferme
+  prima di azioni distruttive, e messaggi di errore comprensibili.
+
+MANUTENZIONE
+  Una volta consegnato il progetto, eventuali aggiornamenti o modifiche
+  ai contenuti (prodotti, testi, immagini) devono essere gestibili
+  autonomamente dall'admin senza toccare codice.
+
+CONTATTI CLIENTE
+  Nome Referente : [Nome e Cognome]
+  Negozio        : [Nome Negozio]
+  Indirizzo      : [Via, Città, CAP]
+  Telefono       : [Numero]
+  Email          : [Email]
+  P.IVA          : [Partita IVA — se disponibile]
+
+████████████████████████████████████████████████████████████████████████████████
+     Brief preparato il 22/03/2026 — Documento riservato uso interno
+████████████████████████████████████████████████████████████████████████████████
