@@ -37,8 +37,8 @@ export default function AdminSettingsPage() {
   const { addToast } = useToast()
   const [activeTab, setActiveTab] = useState("general")
   
-  // Freeze initial configuration to prevent Base UI uncontrolled mutation warnings
-  const initialSettings = useRef(settings).current
+  // Key forcing a re-mount of the form once data is loaded to ensure defaultValues are correct
+  const formKey = getSettings.isSuccess ? "ready" : "loading"
 
   // State for complex settings
   const [openingHours, setOpeningHours] = useState<any>({})
@@ -175,7 +175,7 @@ export default function AdminSettingsPage() {
 
          {/* Content Area */}
          <div className="flex-grow min-w-0">
-            <TabsContent value="general" className="mt-0 space-y-6">
+            <TabsContent value="general" className="mt-0 space-y-6" key={formKey}>
                   <div className="bg-white rounded-3xl border border-border/50 shadow-sm overflow-hidden">
                      <div className="p-8 border-b bg-secondary/10">
                         <h3 className="font-heading font-bold flex items-center">
@@ -187,7 +187,7 @@ export default function AdminSettingsPage() {
                            <div className="space-y-2">
                               <Label>Nome Negozio</Label>
                               <Input 
-                                defaultValue={initialSettings.shop_name || "DetersiviParty"} 
+                                defaultValue={settings.shop_name || "DetersiviParty"} 
                                 onBlur={(e) => handleSave('shop_name', e.target.value)}
                                 className="h-12 rounded-xl" 
                               />
@@ -195,7 +195,7 @@ export default function AdminSettingsPage() {
                            <div className="space-y-2">
                               <Label>Partita IVA</Label>
                               <Input 
-                                defaultValue={initialSettings.vat_number || "IT0123456789"} 
+                                defaultValue={settings.vat_number || "IT0123456789"} 
                                 onBlur={(e) => handleSave('vat_number', e.target.value)}
                                 className="h-12 rounded-xl" 
                               />
@@ -207,7 +207,7 @@ export default function AdminSettingsPage() {
                              rows={3}
                              placeholder="Descrivi il tuo negozio..."
                              className="rounded-xl"
-                             defaultValue={initialSettings.shop_description || "Il tuo punto di riferimento..."}
+                             defaultValue={settings.shop_description || "Il tuo punto di riferimento..."}
                              onBlur={(e) => handleSave('shop_description', e.target.value)}
                            />
                         </div>
@@ -215,7 +215,7 @@ export default function AdminSettingsPage() {
                            <div className="space-y-2">
                               <Label>Email Contatto</Label>
                               <Input 
-                                defaultValue={initialSettings.contact_email || "info@detersiviparty.it"} 
+                                defaultValue={settings.contact_email || "info@detersiviparty.it"} 
                                 onBlur={(e) => handleSave('contact_email', e.target.value)}
                                 className="h-12 rounded-xl" 
                               />
@@ -223,7 +223,7 @@ export default function AdminSettingsPage() {
                            <div className="space-y-2">
                               <Label>Telefono</Label>
                               <Input 
-                                defaultValue={initialSettings.contact_phone || "+39 0185 123456"} 
+                                defaultValue={settings.contact_phone || "+39 0185 123456"} 
                                 onBlur={(e) => handleSave('contact_phone', e.target.value)}
                                 className="h-12 rounded-xl" 
                               />
@@ -232,7 +232,7 @@ export default function AdminSettingsPage() {
                         <div className="space-y-2">
                            <Label>Indirizzo Fisico</Label>
                            <Input 
-                             defaultValue={initialSettings.shop_address || "Via Roma 123, 16038 Santa Margherita Ligure (GE)"} 
+                             defaultValue={settings.shop_address || "Via Roma 123, 16038 Santa Margherita Ligure (GE)"} 
                              onBlur={(e) => handleSave('shop_address', e.target.value)}
                              className="h-12 rounded-xl" 
                            />
@@ -240,7 +240,7 @@ export default function AdminSettingsPage() {
                         <div className="space-y-2 pt-4">
                            <Label>Puntatore Mappa Preciso (Opzionale)</Label>
                            <Input 
-                             defaultValue={initialSettings.map_embed_url || ""} 
+                             defaultValue={settings.map_embed_url || ""} 
                              onBlur={(e) => handleSave('map_embed_url', e.target.value)}
                              placeholder="Es: Via Milano 1, Palermo (oppure un URL Embed di Google Maps)"
                              className="h-12 rounded-xl" 
