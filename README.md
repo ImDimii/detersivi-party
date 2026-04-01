@@ -78,9 +78,7 @@ Il database è strutturato per garantire l'integrità dei dati:
 
 ---
 
-## ❤️ Autore
-
-**Fatto da Dimi**
+**Fatto con <3 da Dimi**
 
 ---
 © 2026 DetersiviParty - Tutti i diritti riservati.
