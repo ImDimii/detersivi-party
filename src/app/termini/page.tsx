@@ -3,8 +3,12 @@
 import { Navbar } from "@/components/layout/Navbar"
 import { Footer } from "@/components/layout/Footer"
 import { Gavel, Scale, AlertCircle, FileCheck } from "lucide-react"
+import { useSettings } from "@/hooks/useSettings"
 
 export default function TerminiPage() {
+  const { getSettings } = useSettings()
+  const settings = getSettings.data || {}
+  const shopName = settings.shop_name || "DetersiviParty"
   return (
     <main className="flex flex-col min-h-screen bg-background">
       <Navbar />
@@ -24,7 +28,7 @@ export default function TerminiPage() {
                     <Scale className="w-5 h-5 text-indigo-500" /> 1. Oggetto del Servizio
                  </h2>
                  <p className="text-muted-foreground leading-relaxed">
-                    DetersiviParty offre un servizio di vendita online di detergenti, prodotti per l'igiene della casa e servizi di prenotazione allestimenti per eventi. Gli ordini possono essere ritirati in negozio o consegnati a domicilio nelle zone coperte dal servizio.
+                    <span className="font-bold">{shopName}</span> offre un servizio di vendita online di detergenti, prodotti per l'igiene della casa e servizi di prenotazione allestimenti per eventi. Gli ordini possono essere ritirati in negozio o consegnati a domicilio nelle zone coperte dal servizio.
                  </p>
               </section>
 
@@ -49,7 +53,7 @@ export default function TerminiPage() {
               <section className="space-y-4 p-8 bg-indigo-50 rounded-3xl border-2 border-indigo-100">
                  <h3 className="text-lg font-black text-indigo-700">Responsabilità</h3>
                  <p className="text-sm text-indigo-600/80 leading-relaxed">
-                    DetersiviParty non è responsabile per danni derivanti da un uso improprio dei prodotti venduti. Si raccomanda di leggere sempre attentamente le etichette e le istruzioni d'uso fornite dai produttori.
+                    <span className="font-bold">{shopName}</span> non è responsabile per danni derivanti da un uso improprio dei prodotti venduti. Si raccomanda di leggere sempre attentamente le etichette e le istruzioni d'uso fornite dai produttori.
                  </p>
               </section>
            </div>

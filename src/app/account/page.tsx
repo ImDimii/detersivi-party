@@ -53,7 +53,7 @@ export default function AccountOverview() {
                  <>
                    <div className="flex justify-between items-center">
                       <div className="space-y-1">
-                         <p className="font-bold">Ordine #{lastOrder.order_number}</p>
+                         <p className="font-bold">Ordine {lastOrder.order_number}</p>
                          <p className="text-xs text-muted-foreground uppercase font-bold">{new Date(lastOrder.created_at).toLocaleDateString()}</p>
                       </div>
                       <span className="text-[10px] font-bold uppercase px-2.5 py-1 bg-amber-500/10 text-amber-600 rounded-full border border-amber-200">
@@ -104,8 +104,8 @@ export default function AccountOverview() {
                          <span className="text-xl font-heading font-black">{new Date(nextReservation.event_date).getDate()}</span>
                       </div>
                       <div>
-                         <h4 className="font-bold text-lg leading-tight capitalize">{nextReservation.event_type}</h4>
-                         <p className="text-sm text-muted-foreground">{new Date(nextReservation.event_date).toLocaleDateString('it-IT', { weekday: 'long' })}, ore {nextReservation.slot_start}</p>
+                         <p className="font-bold">{nextReservation.event_type} - {nextReservation.type}</p>
+                         <p className="text-sm text-muted-foreground">{new Date(nextReservation.event_date).toLocaleDateString('it-IT', { weekday: 'long' })}, ore {nextReservation.slot_start.slice(0, 5)}</p>
                       </div>
                    </div>
                    

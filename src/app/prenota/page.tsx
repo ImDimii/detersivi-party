@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import React, { useState } from "react"
+import { useAuth } from "@/hooks/useAuth"
 import { Navbar } from "@/components/layout/Navbar"
 import { Footer } from "@/components/layout/Footer"
 import { Calendar } from "@/components/ui/calendar"
@@ -16,7 +17,7 @@ import {
   SelectValue 
 } from "@/components/ui/select"
 import { Calendar as CalendarIcon, Clock, Users, PartyPopper, ChevronRight, CheckCircle2 } from "lucide-react"
-import { format } from "date-fns"
+import { format, startOfDay } from "date-fns"
 import { it } from "date-fns/locale"
 import { motion, AnimatePresence } from "framer-motion"
 import { useRouter } from "next/navigation"
@@ -24,8 +25,11 @@ import { useReservations } from "@/hooks/useReservations"
 import Link from "next/link"
 
 export default function ReservationPage() {
+  const { user } = useAuth()
   const [date, setDate] = useState<Date | undefined>(undefined)
   const [step, setStep] = useState<"calendar" | "details" | "success">("calendar")
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   
   const [formData, setFormData] = useState({
     eventType: "",
@@ -36,6 +40,17 @@ export default function ReservationPage() {
     phone: "",
     notes: ""
   })
+
+  // Pre-fill from logged in user
+  React.useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        email: user.email ?? prev.email,
+        name: user.user_metadata?.full_name ?? prev.name,
+      }))
+    }
+  }, [user])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -48,6 +63,8 @@ export default function ReservationPage() {
   const handleNext = async () => {
     if (step === "calendar" && date) setStep("details")
     else if (step === "details") {
+      setSubmitError(null)
+      setIsSubmitting(true)
       try {
         const resData = {
           customer_name: formData.name,
@@ -64,9 +81,11 @@ export default function ReservationPage() {
         
         const res = await createReservation.mutateAsync(resData)
         router.push(`/prenota/conferma/${res.id}`)
-      } catch (error) {
-        console.error("Reservation failed:", error)
-        alert("Errore durante l'invio della prenotazione. Riprova.")
+      } catch (error: any) {
+        console.error("Reservation failed:", error?.message, error?.code, JSON.stringify(error))
+        setSubmitError(error?.message ?? "Errore durante l'invio. Riprova.")
+      } finally {
+        setIsSubmitting(false)
       }
     }
   }
@@ -115,7 +134,7 @@ export default function ReservationPage() {
                             onSelect={setDate}
                             locale={it}
                             className="rounded-2xl border border-border/30 p-4 mx-auto"
-                            disabled={(date) => date < new Date()}
+                            disabled={(d) => d < startOfDay(new Date())}
                           />
                        </div>
                    </div>
@@ -184,22 +203,22 @@ export default function ReservationPage() {
                             <div className="space-y-2">
                                <Label className="flex items-center"><PartyPopper className="w-3.5 h-3.5 mr-2 text-primary" /> Tipo di Evento</Label>
                                <Select onValueChange={(v: string | null) => setFormData(p => ({ ...p, eventType: v || "" }))}>
-                                  <SelectTrigger className="h-12 rounded-xl">
+                                  <SelectTrigger className="h-12 rounded-xl w-full">
                                      <SelectValue placeholder="Seleziona evento" />
                                   </SelectTrigger>
                                   <SelectContent>
-                                     <SelectItem value="compleanno">Compleanno</SelectItem>
-                                     <SelectItem value="laurea">Laurea</SelectItem>
-                                     <SelectItem value="matrimonio">Matrimonio / Anniversario</SelectItem>
-                                     <SelectItem value="battesimo">Battesimo / Comunione</SelectItem>
-                                     <SelectItem value="altro">Altro Evento</SelectItem>
+                                     <SelectItem value="birthday">Compleanno</SelectItem>
+                                     <SelectItem value="graduation">Laurea</SelectItem>
+                                     <SelectItem value="wedding">Matrimonio / Anniversario</SelectItem>
+                                     <SelectItem value="corporate">Battesimo / Comunione</SelectItem>
+                                     <SelectItem value="other">Altro Evento</SelectItem>
                                   </SelectContent>
                                </Select>
                             </div>
                             <div className="space-y-2">
                                <Label className="flex items-center"><Clock className="w-3.5 h-3.5 mr-2 text-primary" /> Orario Preferito</Label>
                                <Select onValueChange={(v: string | null) => setFormData(p => ({ ...p, time: v || "" }))}>
-                                  <SelectTrigger className="h-12 rounded-xl">
+                                  <SelectTrigger className="h-12 rounded-xl w-full">
                                      <SelectValue placeholder="Seleziona orario" />
                                   </SelectTrigger>
                                   <SelectContent>
@@ -213,13 +232,23 @@ export default function ReservationPage() {
                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-border/30">
                             <div className="space-y-2">
                                <Label>Nome Completo</Label>
-                               <Input name="name" value={formData.name} onChange={handleInputChange} placeholder="Inserisci il tuo nome" className="h-12 rounded-xl" />
+                               <Input name="name" value={formData.name} onChange={handleInputChange} placeholder="Inserisci il tuo nome" className="h-12 rounded-xl" required />
+                            </div>
+                            <div className="space-y-2">
+                               <Label>Email</Label>
+                               <Input name="email" type="email" value={formData.email} onChange={handleInputChange} placeholder="mario@esempio.it" className="h-12 rounded-xl" required />
                             </div>
                             <div className="space-y-2">
                                <Label>Telefono</Label>
-                               <Input name="phone" value={formData.phone} onChange={handleInputChange} placeholder="Il tuo numero" className="h-12 rounded-xl" />
+                               <Input name="phone" value={formData.phone} onChange={handleInputChange} placeholder="Il tuo numero" className="h-12 rounded-xl" required />
                             </div>
                          </div>
+
+                         {submitError && (
+                           <div className="p-4 bg-destructive/5 border border-destructive/20 rounded-xl text-destructive text-sm font-bold">
+                             {submitError}
+                           </div>
+                         )}
                          
                          <div className="space-y-2">
                             <Label>Note Aggiuntive</Label>
@@ -237,8 +266,8 @@ export default function ReservationPage() {
                          <Button variant="ghost" onClick={() => setStep("calendar")} className="font-bold">
                             Modifica Data
                          </Button>
-                         <Button size="lg" onClick={handleNext} className="h-14 px-12 font-bold shadow-xl rounded-xl">
-                            Invia Richiesta
+                         <Button size="lg" onClick={handleNext} disabled={isSubmitting} className="h-14 px-12 font-bold shadow-xl rounded-xl">
+                            {isSubmitting ? "Invio..." : "Invia Richiesta"}
                          </Button>
                       </div>
                    </div>

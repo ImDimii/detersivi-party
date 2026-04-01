@@ -86,9 +86,9 @@ export function ProductPreview({ products, isLoading }: ProductPreviewProps) {
           </div>
           
           <div className="space-y-1 px-1">
-             <Link href={`/catalogo/${product.categories.slug}`}>
+             <Link href={product.categories?.slug ? `/catalogo/${product.categories.slug}` : '#'}>
                 <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest hover:text-primary">
-                  {product.categories.name}
+                  {product.categories?.name || 'Senza categoria'}
                 </p>
              </Link>
              <Link href={`/prodotto/${product.slug}`}>

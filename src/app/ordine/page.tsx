@@ -1,14 +1,16 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useCart } from "@/hooks/useCart"
+import { useAuth } from "@/hooks/useAuth"
+import { AuthModal } from "@/components/shared/AuthModal"
 import { Navbar } from "@/components/layout/Navbar"
 import { Footer } from "@/components/layout/Footer"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { ShoppingBag, Truck, Store, ArrowRight, ArrowLeft, CheckCircle2 } from "lucide-react"
+import { ShoppingBag, Truck, Store, ArrowRight, ArrowLeft, CheckCircle2, LogIn } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useRouter } from "next/navigation"
 import { useOrders } from "@/hooks/useOrders"
@@ -18,8 +20,11 @@ type CheckoutStep = "review" | "details" | "confirm"
 
 export default function CheckoutPage() {
   const { items, getTotal, clearCart } = useCart()
+  const { user, loading: authLoading } = useAuth()
+  const router = useRouter()
   const [step, setStep] = useState<CheckoutStep>("review")
   const [orderType, setOrderType] = useState<"pickup" | "delivery">("pickup")
+  const [showAuthModal, setShowAuthModal] = useState(false)
   
   const [formData, setFormData] = useState({
     name: "",
@@ -30,12 +35,27 @@ export default function CheckoutPage() {
     notes: ""
   })
 
+  // Pre-fill name and email from user profile
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        name: user.user_metadata?.full_name ?? prev.name,
+        email: user.email ?? prev.email,
+      }))
+    }
+  }, [user])
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
   const handleNext = () => {
+    if (!user) {
+      setShowAuthModal(true)
+      return
+    }
     if (step === "review") setStep("details")
     else if (step === "details") setStep("confirm")
   }
@@ -46,16 +66,21 @@ export default function CheckoutPage() {
   }
 
   const { createOrder } = useOrders()
-  const router = useRouter()
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleSubmit = async () => {
+    if (isSubmitting) return
+    setIsSubmitting(true)
     try {
       const orderData = {
+        user_id: user?.id ?? null,
         customer_name: formData.name,
         customer_email: formData.email,
         customer_phone: formData.phone,
         type: orderType,
-        delivery_address: orderType === 'delivery' ? { street: formData.address, city: formData.city } : null,
+        delivery_address: orderType === 'delivery'
+          ? { street: formData.address, city: formData.city }
+          : {},
         subtotal: getTotal(),
         total: getTotal(),
         items: items.map(item => ({
@@ -70,9 +95,12 @@ export default function CheckoutPage() {
       const res = await createOrder.mutateAsync(orderData as any)
       clearCart()
       router.push(`/ordine/conferma/${res.id}`)
-    } catch (error) {
+    } catch (error: any) {
       console.error("Order submission failed:", error)
-      alert("Errore durante l'invio dell'ordine. Riprova più tardi.")
+      const msg = error?.message ?? "Errore sconosciuto"
+      alert(`Errore durante l'invio dell'ordine: ${msg}`)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -99,6 +127,14 @@ export default function CheckoutPage() {
 
   return (
     <main className="flex flex-col min-h-screen bg-background">
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onSuccess={() => {
+          setShowAuthModal(false)
+          setStep("details")
+        }}
+      />
       <Navbar />
       
       <div className="flex-grow pt-32 pb-24">
@@ -310,8 +346,10 @@ export default function CheckoutPage() {
                    </div>
 
                    <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
-                     <Button variant="outline" size="lg" onClick={handleBack} className="h-14 px-8 font-bold">Modifica Dati</Button>
-                     <Button size="lg" onClick={handleSubmit} className="h-14 px-12 font-bold shadow-xl">Invia Ordine</Button>
+                     <Button variant="outline" size="lg" onClick={handleBack} disabled={isSubmitting} className="h-14 px-8 font-bold">Modifica Dati</Button>
+                     <Button size="lg" onClick={handleSubmit} disabled={isSubmitting} className="h-14 px-12 font-bold shadow-xl">
+                       {isSubmitting ? 'Invio in corso…' : 'Invia Ordine'}
+                     </Button>
                    </div>
                    
                    <p className="text-xs text-muted-foreground max-w-sm mx-auto">

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { 
-  Calendar, 
+  Calendar as CalendarIcon, 
   Search, 
   MoreVertical, 
   Eye, 
@@ -23,6 +23,17 @@ import { useReservations } from "@/hooks/useReservations"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Calendar } from "@/components/ui/calendar"
+import { format } from "date-fns"
+import { it } from "date-fns/locale"
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select"
+import Link from "next/link"
 
 import { useToast } from "@/hooks/useToast"
 import { CustomModal } from "@/components/ui/CustomModal"
@@ -34,12 +45,17 @@ export default function AdminReservationsPage() {
   const [statusFilter, setStatusFilter] = useState("all")
   const [reservationToCancel, setReservationToCancel] = useState<string | null>(null)
   const [isCancelling, setIsCancelling] = useState(false)
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date())
 
   const reservations = getReservations.data || []
   
   const filteredReservations = reservations.filter(r => 
     statusFilter === "all" ? true : r.status === statusFilter
   )
+
+  const calendarReservations = reservations.filter(r => 
+    selectedDate ? r.event_date === format(selectedDate, 'yyyy-MM-dd') : false
+  ).sort((a, b) => a.slot_start.localeCompare(b.slot_start))
 
   const handleUpdateStatus = async (id: string, status: string) => {
     try {
@@ -112,16 +128,45 @@ export default function AdminReservationsPage() {
          ))}
       </div>
 
+      {/* Filters Bar */}
+      <div className="bg-white p-6 rounded-3xl border border-border/50 shadow-sm flex flex-col lg:flex-row gap-4">
+         <div className="flex-grow" />
+         <div className="flex gap-4">
+            <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v || "all")}>
+               <SelectTrigger className="w-[200px] h-12 rounded-xl">
+                  <SelectValue placeholder="Stato Prenotazione" />
+               </SelectTrigger>
+               <SelectContent className="bg-white border rounded-xl shadow-xl z-50 p-1">
+                  <SelectItem value="all">Tutte le prenotazioni</SelectItem>
+                  <SelectItem value="pending">In Attesa</SelectItem>
+                  <SelectItem value="confirmed">Confermate</SelectItem>
+                  <SelectItem value="completed">Completate</SelectItem>
+                  <SelectItem value="cancelled">Annullate</SelectItem>
+               </SelectContent>
+            </Select>
+         </div>
+      </div>
+
       {view === "list" ? (
         <div className="space-y-6">
            {getReservations.isLoading ? (
               [1, 2].map(i => <div key={i} className="h-48 bg-white rounded-3xl animate-pulse border" />)
            ) : filteredReservations.map((res) => (
-             <div key={res.id} className="bg-white rounded-3xl border border-border/50 shadow-sm overflow-hidden group hover:shadow-md transition-all flex flex-col md:flex-row">
-                <div className={`p-8 md:w-48 flex flex-col items-center justify-center text-center border-b md:border-b-0 md:border-r border-border/30 ${res.status === 'confirmed' ? 'bg-success/5' : 'bg-amber-500/5'}`}>
+             <div key={res.id} className={`rounded-3xl border shadow-sm overflow-hidden group hover:shadow-md transition-all flex flex-col md:flex-row ${
+                res.status === 'pending' ? 'bg-amber-500/5 border-amber-500/30' :
+                res.status === 'confirmed' ? 'bg-success/5 border-success/30' :
+                res.status === 'completed' ? 'bg-secondary/50 border-border/50 grayscale-[0.5]' :
+                res.status === 'cancelled' || res.status === 'rejected' ? 'bg-destructive/5 border-destructive/30 opacity-75' :
+                'bg-white border-border/50'
+              }`}>
+                <div className={`p-8 md:w-48 flex flex-col items-center justify-center text-center border-b md:border-b-0 md:border-r border-border/30 ${
+                   res.status === 'confirmed' ? 'bg-success/10' : 
+                   res.status === 'pending' ? 'bg-amber-500/10' : 
+                   res.status === 'cancelled' ? 'bg-destructive/10' : 'bg-secondary/50'
+                 }`}>
                    <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{new Date(res.event_date).toLocaleDateString('it-IT', { month: 'long' })}</span>
                    <span className="text-4xl font-heading font-black text-foreground">{new Date(res.event_date).getDate()}</span>
-                   <span className="text-xs font-bold text-muted-foreground uppercase">{res.slot_start}</span>
+                   <span className="text-xs font-bold text-muted-foreground uppercase">{res.slot_start.slice(0, 5)}</span>
                 </div>
                 
                 <div className="p-8 flex-grow space-y-4">
@@ -146,9 +191,11 @@ export default function AdminReservationsPage() {
                    </p>
 
                    <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-border/30">
-                      <Button variant="outline" className="h-11 rounded-xl font-bold flex-grow">
-                         <Eye className="w-4 h-4 mr-3" /> Vedi Dettagli
-                      </Button>
+                      <Link href={`/prenota/conferma/${res.id}`} className="flex-grow">
+                         <Button variant="outline" className="h-11 rounded-xl font-bold w-full">
+                            <Eye className="w-4 h-4 mr-3" /> Vedi Dettagli
+                         </Button>
+                      </Link>
                       <div className="flex gap-2 flex-grow">
                          {res.status === 'pending' && (
                             <>
@@ -177,23 +224,92 @@ export default function AdminReservationsPage() {
                 </div>
              </div>
            ))}
-           {!getReservations.isLoading && filteredReservations.length === 0 && (
-             <div className="bg-white rounded-3xl border border-border/50 shadow-sm p-20 text-center text-muted-foreground">
-                <Calendar className="w-12 h-12 mx-auto mb-4 opacity-10" />
-                <p className="font-bold">Nessuna prenotazione trovata</p>
-             </div>
-           )}
+            {!getReservations.isLoading && filteredReservations.length === 0 && (
+              <div className="bg-white rounded-3xl border border-border/50 shadow-sm p-20 text-center text-muted-foreground">
+                 <CalendarIcon className="w-12 h-12 mx-auto mb-4 opacity-10" />
+                 <p className="font-bold">Nessuna prenotazione trovata</p>
+              </div>
+            )}
         </div>
       ) : (
-        <div className="bg-white rounded-3xl border border-border/50 shadow-xl p-12 text-center space-y-6">
-           <div className="w-20 h-20 bg-secondary rounded-full flex items-center justify-center mx-auto text-muted-foreground">
-              <Calendar className="w-10 h-10" />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+           <div className="bg-white rounded-3xl border border-border/50 shadow-sm p-6 lg:sticky lg:top-8">
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={setSelectedDate}
+                locale={it}
+                className="w-full flex justify-center"
+                modifiers={{
+                  hasReservation: reservations.map(r => new Date(r.event_date))
+                }}
+                modifiersStyles={{
+                  hasReservation: { backgroundColor: 'hsl(var(--primary)/0.15)', color: 'hsl(var(--primary))', fontWeight: '900' }
+                }}
+              />
            </div>
-           <div className="space-y-2">
-              <h3 className="text-2xl font-heading font-extrabold">Vista Calendario</h3>
-              <p className="text-muted-foreground max-w-sm mx-auto">La vista calendario interattiva sarà disponibile a breve per una gestione visuale degli slot orari.</p>
+           
+           <div className="col-span-1 lg:col-span-2 space-y-6">
+              <div className="bg-white rounded-3xl border border-border/50 shadow-sm p-6 mb-6">
+                 <h2 className="text-xl font-heading font-extrabold flex items-center space-x-2">
+                    <CalendarIcon className="w-6 h-6 text-primary" />
+                    <span>Appuntamenti del {selectedDate ? format(selectedDate, "dd MMMM yyyy", { locale: it }) : ''}</span>
+                 </h2>
+              </div>
+
+              {calendarReservations.length === 0 ? (
+                 <div className="bg-white rounded-3xl border border-border/50 shadow-sm p-16 text-center text-muted-foreground">
+                    <CalendarIcon className="w-12 h-12 mx-auto mb-4 opacity-10" />
+                    <p className="font-bold">Nessun appuntamento per questa data.</p>
+                 </div>
+              ) : (
+                 <div className="space-y-4">
+                    {calendarReservations.map(res => (
+                       <div key={res.id} className={`rounded-3xl border p-6 flex flex-col md:flex-row gap-6 items-start hover:shadow-md transition-all shadow-sm ${
+                         res.status === 'pending' ? 'bg-amber-500/5 border-amber-500/30' :
+                         res.status === 'confirmed' ? 'bg-success/5 border-success/30' :
+                         res.status === 'completed' ? 'bg-secondary/50 border-border/50 grayscale-[0.5]' :
+                         res.status === 'cancelled' || res.status === 'rejected' ? 'bg-destructive/5 border-destructive/30 opacity-75' :
+                         'bg-white border-border/50'
+                       }`}>
+                          <div className={`p-4 rounded-2xl md:w-32 text-center flex-shrink-0 border ${
+                            res.status === 'confirmed' ? 'bg-success/10' : 
+                            res.status === 'pending' ? 'bg-amber-500/10' : 
+                            res.status === 'cancelled' ? 'bg-destructive/10' : 'bg-secondary/50'
+                          }`}>
+                             <p className="font-heading font-black text-2xl text-foreground">{res.slot_start.slice(0, 5)}</p>
+                             <p className="text-xs font-bold text-muted-foreground uppercase">{res.slot_end.slice(0, 5)}</p>
+                          </div>
+                          
+                          <div className="flex-grow space-y-3">
+                             <div className="flex justify-between items-start">
+                                <div>
+                                   <h3 className="text-xl font-black font-heading">{res.customer_name}</h3>
+                                   <div className="flex items-center text-sm font-medium text-muted-foreground mt-1">
+                                      <span className="bg-secondary px-2 py-0.5 rounded text-[10px] font-bold uppercase mr-3">{res.type}</span>
+                                      <span className="capitalize">{res.event_type}</span>
+                                   </div>
+                                </div>
+                                <div className={`text-[10px] font-bold uppercase px-3 py-1 rounded-full border ${getStatusColor(res.status)}`}>
+                                   {res.status}
+                                </div>
+                             </div>
+
+                             <p className="text-sm text-muted-foreground line-clamp-2 italic">
+                                "{res.notes || "Nessuna nota."}"
+                             </p>
+                             
+                             <div className="flex gap-2 pt-2">
+                                <Link href={`/prenota/conferma/${res.id}`} className="flex-grow">
+                                   <Button variant="outline" className="w-full h-10 rounded-xl font-bold bg-white/50">Dettagli</Button>
+                                </Link>
+                             </div>
+                          </div>
+                       </div>
+                    ))}
+                 </div>
+              )}
            </div>
-           <Button variant="secondary" onClick={() => setView("list")} className="font-bold">Torna alla Lista</Button>
         </div>
       )}
 
@@ -210,4 +326,5 @@ export default function AdminReservationsPage() {
     </div>
   )
 }
+
 

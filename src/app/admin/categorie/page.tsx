@@ -2,17 +2,7 @@
 
 import { useState } from "react"
 import { useCategories } from "@/hooks/useCategories"
-import { 
-  Tags, 
-  Plus, 
-  Search, 
-  MoreVertical, 
-  Edit, 
-  Trash2, 
-  ChevronRight,
-  FolderTree,
-  ImageIcon
-} from "lucide-react"
+import { Tags, Plus, Search, MoreVertical, Edit, Trash2, ChevronRight, FolderTree, ImageIcon, UploadCloud } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { 
@@ -28,6 +18,8 @@ import { CustomModal } from "@/components/ui/CustomModal"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
+import { useRef } from "react"
+import { createClient } from "@/lib/supabase/client"
 
 export default function AdminCategoriesPage() {
   const [search, setSearch] = useState("")
@@ -64,6 +56,36 @@ export default function AdminCategoriesPage() {
     } catch (err: any) {
       addToast("Errore aggiornamento stato: " + err.message, "error")
     }
+  }
+
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = async (event) => {
+      try {
+        const text = event.target?.result as string
+        const data = JSON.parse(text)
+        
+        if (!Array.isArray(data)) {
+          throw new Error("Il file deve contenere un array di categorie.")
+        }
+
+        const supabase = createClient()
+        const { error } = await supabase.from('categories').insert(data)
+        
+        if (error) throw error
+        
+        addToast(`Importate ${data.length} categorie con successo!`, "success")
+        window.location.reload()
+      } catch (err: any) {
+        addToast("Errore importazione: " + err.message, "error")
+      }
+    }
+    reader.readAsText(file)
   }
 
   return (
@@ -104,8 +126,8 @@ export default function AdminCategoriesPage() {
       </div>
 
       {/* Search & Filters */}
-      <div className="bg-white p-6 rounded-3xl border border-border/50 shadow-sm flex flex-col md:flex-row gap-4">
-        <div className="relative flex-grow">
+      <div className="bg-white p-6 rounded-3xl border border-border/50 shadow-sm flex flex-col md:flex-row gap-4 items-center">
+        <div className="relative flex-grow w-full">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input 
             placeholder="Cerca per nome o slug..." 
@@ -114,6 +136,18 @@ export default function AdminCategoriesPage() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
+        
+        <input 
+          type="file" 
+          accept=".json" 
+          ref={fileInputRef} 
+          className="hidden" 
+          onChange={handleImport} 
+        />
+        <Button variant="outline" className="h-12 rounded-xl font-bold whitespace-nowrap" onClick={() => fileInputRef.current?.click()}>
+          <UploadCloud className="w-5 h-5 mr-2" />
+          Importa JSON
+        </Button>
       </div>
 
       {/* Categories Table */}

@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, Suspense } from "react"
+import { useSearchParams } from "next/navigation"
 import { Navbar } from "@/components/layout/Navbar"
 import { Footer } from "@/components/layout/Footer"
 import { Button } from "@/components/ui/button"
@@ -15,13 +16,14 @@ import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/useToast"
 import { cn } from "@/lib/utils"
 
-export default function LoginPage() {
+function LoginForm() {
   const { addToast } = useToast()
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<"login" | "register">("login")
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClient()
 
   const handleAuth = async (e: React.FormEvent, type: "login" | "register") => {
@@ -38,7 +40,8 @@ export default function LoginPage() {
         const { error } = await supabase.auth.signInWithPassword({ email, password })
         if (error) throw error
         addToast("Bentornato! Accesso effettuato.", "success")
-        router.push("/account")
+        const redirectTo = searchParams.get('redirect') ?? '/account'
+        router.push(redirectTo)
       } else {
         const firstName = formData.get("first-name") as string
         const lastName = formData.get("last-name") as string
@@ -152,7 +155,7 @@ export default function LoginPage() {
                       <div className="space-y-2">
                          <div className="flex justify-between items-center px-1">
                             <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Password</Label>
-                            <button type="button" className="text-[10px] font-black text-primary hover:underline uppercase">Persa?</button>
+                            <Link href="/reset-password" className="text-[10px] font-black text-primary hover:underline uppercase">Persa?</Link>
                          </div>
                         <div className="relative group">
                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-muted-foreground/40 group-focus-within:text-primary transition-colors" />
@@ -232,5 +235,13 @@ export default function LoginPage() {
 
       <Footer />
     </main>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   )
 }

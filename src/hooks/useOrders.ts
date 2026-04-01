@@ -29,6 +29,7 @@ export function useOrders(filters: { status?: string, userId?: string } = {}) {
       if (error) throw error
       return data as Order[]
     },
+    refetchInterval: 10000, // <-- LIVE POLLING OGNI 10 SECONDI
   })
 
   const getMyOrders = (userId: string) => useQuery({
@@ -46,19 +47,35 @@ export function useOrders(filters: { status?: string, userId?: string } = {}) {
       if (error) throw error
       return data
     },
-    enabled: !!userId
+    enabled: !!userId,
+    refetchInterval: 10000, // <-- LIVE POLLING OGNI 10 SECONDI
   })
 
   const createOrder = useMutation({
     mutationFn: async (orderData: Omit<Database['public']['Tables']['orders']['Insert'], 'order_number'> & { items: Database['public']['Tables']['order_items']['Insert'][] }) => {
       const { items, ...order } = orderData
+
+      // Use getUser() — always server-verified, never stale
+      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
       
-      // 1. Create order
+      console.log('[createOrder] authUser:', authUser?.id ?? 'null', 'authError:', authError?.message)
+      
+      if (!authUser) {
+        throw new Error('Devi essere loggato per inviare un ordine. Per favore accedi e riprova.')
+      }
+
+      // 1. Create order — sequential number starting from #2000
+      const { count: orderCount } = await supabase
+        .from('orders')
+        .select('*', { count: 'exact', head: true })
+      const orderNumber = `#${2000 + (orderCount ?? 0)}`
+
       const { data: orderResponse, error: orderError } = await supabase
         .from('orders')
-        .insert([{ 
-          ...order, 
-          order_number: `ORD-${Date.now()}` 
+        .insert([{
+          ...order,
+          user_id: authUser.id,
+          order_number: orderNumber
         }])
         .select()
         .single()
@@ -77,10 +94,29 @@ export function useOrders(filters: { status?: string, userId?: string } = {}) {
       
       if (itemsError) throw itemsError
 
+      // 3. Decrement stock for each ordered product (non-fatal: order is already saved)
+      await Promise.allSettled(
+        items.map(async item => {
+          if (!item.product_id) return
+          const { data: prod } = await supabase
+            .from('products')
+            .select('stock_quantity')
+            .eq('id', item.product_id)
+            .single()
+          if (!prod) return
+          const newStock = Math.max(0, (prod.stock_quantity ?? 0) - item.quantity)
+          await supabase
+            .from('products')
+            .update({ stock_quantity: newStock })
+            .eq('id', item.product_id)
+        })
+      )
+
       return orderResponse
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] })
+      queryClient.invalidateQueries({ queryKey: ['products'] })
     }
   })
 
@@ -93,6 +129,9 @@ export function useOrders(filters: { status?: string, userId?: string } = {}) {
         .select()
       
       if (error) throw error
+      if (!data || data.length === 0) {
+        throw new Error('Impossibile aggiornare: permesso negato o ordine non trovato.')
+      }
       return data[0]
     },
     onSuccess: () => {

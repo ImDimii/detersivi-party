@@ -1,13 +1,17 @@
 "use client"
 
 import { useCart } from "@/hooks/useCart"
+import { useCartSync } from "@/hooks/useCartSync"
 import { X, ShoppingCart, Trash2, Plus, Minus, ArrowRight } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion" 
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 
 export function CartDrawer() {
   const { items, isOpen, setIsOpen, removeItem, updateQuantity, getTotal } = useCart()
+  
+  // Activate background sync when drawer is open or mounted
+  useCartSync()
 
   return (
     <AnimatePresence>
@@ -97,7 +101,8 @@ export function CartDrawer() {
                              <span className="w-8 text-center text-sm font-bold font-mono">{item.quantity}</span>
                              <button 
                                 onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                className="p-1 hover:text-primary transition-colors"
+                                disabled={item.quantity >= (item.product.stock_quantity ?? Infinity)}
+                                className="p-1 hover:text-primary transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                              >
                                 <Plus className="w-3.5 h-3.5" />
                              </button>

@@ -29,18 +29,22 @@ export const useCart = create<CartStore>()(
       addItem: (product, quantity = 1, variant) => {
         const currentItems = get().items
         const existingItem = currentItems.find(item => item.id === product.id + (variant || ''))
+        const stock = product.stock_quantity ?? Infinity
 
         if (existingItem) {
+          const newQty = Math.min(existingItem.quantity + quantity, stock)
           set({
             items: currentItems.map(item =>
               item.id === product.id + (variant || '')
-                ? { ...item, quantity: item.quantity + quantity }
+                ? { ...item, quantity: newQty }
                 : item
             ),
           })
         } else {
+          const initialQty = Math.min(quantity, stock)
+          if (initialQty <= 0) return
           set({
-            items: [...currentItems, { id: product.id + (variant || ''), product, quantity, variant }],
+            items: [...currentItems, { id: product.id + (variant || ''), product, quantity: initialQty, variant }],
           })
         }
         set({ isOpen: true }) // Open cart when item is added
@@ -56,9 +60,11 @@ export const useCart = create<CartStore>()(
           return
         }
         set({
-          items: get().items.map(item =>
-            item.id === id ? { ...item, quantity } : item
-          ),
+          items: get().items.map(item => {
+            if (item.id !== id) return item
+            const stock = item.product.stock_quantity ?? Infinity
+            return { ...item, quantity: Math.min(quantity, stock) }
+          }),
         })
       },
       clearCart: () => set({ items: [] }),

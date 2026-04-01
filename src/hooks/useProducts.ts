@@ -13,6 +13,8 @@ export interface ProductFilters {
   isNew?: boolean
   hasDiscount?: boolean
   status?: 'published' | 'draft' | 'archived'
+  sortBy?: 'price' | 'name' | 'created_at'
+  sortOrder?: 'asc' | 'desc'
 }
 
 export function useProducts(filters: ProductFilters = {}) {
@@ -22,15 +24,25 @@ export function useProducts(filters: ProductFilters = {}) {
   const getProducts = useQuery({
     queryKey: ['products', filters],
     queryFn: async () => {
-      let query = supabase
-        .from('products')
-        .select(`
+      const selectStr = filters.categorySlug 
+        ? `
+          *,
+          categories!inner (
+            name,
+            slug
+          )
+        `
+        : `
           *,
           categories (
             name,
             slug
           )
-        `)
+        `
+
+      let query = supabase
+        .from('products')
+        .select(selectStr)
 
       if (filters.status) {
         query = query.eq('status', filters.status)
@@ -39,7 +51,7 @@ export function useProducts(filters: ProductFilters = {}) {
       }
 
       if (filters.categorySlug) {
-        query = query.filter('categories.slug', 'eq', filters.categorySlug)
+        query = query.eq('categories.slug', filters.categorySlug)
       }
 
       if (filters.search) {
@@ -66,7 +78,10 @@ export function useProducts(filters: ProductFilters = {}) {
         query = query.not('price_original', 'is', null).gt('price_original', 0)
       }
 
-      const { data, error } = await query.order('created_at', { ascending: false })
+      const sortColumn = filters.sortBy || 'created_at'
+      const sortAscending = filters.sortOrder === 'asc'
+
+      const { data, error } = await query.order(sortColumn, { ascending: sortAscending })
 
       if (error) throw error
       return data as (Product & { categories: { name: string, slug: string } })[]

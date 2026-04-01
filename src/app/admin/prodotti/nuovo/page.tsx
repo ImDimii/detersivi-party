@@ -38,10 +38,25 @@ export default function NewProductPage() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    slug: string;
+    category_id: string | null;
+    sku: string;
+    description_short: string;
+    description_long: string;
+    price: string;
+    price_original: string;
+    stock_quantity: string;
+    stock_alert_threshold: string;
+    status: 'published' | 'draft' | 'archived';
+    is_featured: boolean;
+    is_new: boolean;
+    images: string[];
+  }>({
     name: "",
     slug: "",
-    category_id: "",
+    category_id: null,
     sku: "",
     description_short: "",
     description_long: "",
@@ -49,10 +64,10 @@ export default function NewProductPage() {
     price_original: "",
     stock_quantity: "0",
     stock_alert_threshold: "5",
-    status: "draft" as 'published' | 'draft' | 'archived',
+    status: "draft",
     is_featured: false,
     is_new: true,
-    images: [] as string[]
+    images: []
   })
 
   const generateSlug = (name: string) => {
@@ -170,8 +185,8 @@ export default function NewProductPage() {
                      <div className="space-y-2">
                         <Label>Categoria</Label>
                         <Select 
-                          value={(formData.category_id as string) || "none"} 
-                          onValueChange={(v) => setFormData({...formData, category_id: v === "none" ? "" : v})}
+                          value={formData.category_id || "none"} 
+                          onValueChange={(v) => setFormData({...formData, category_id: v === "none" ? null : v})}
                         >
                            <SelectTrigger className="h-12 rounded-xl">
                               <SelectValue placeholder="Seleziona categoria" />
@@ -224,15 +239,38 @@ export default function NewProductPage() {
                   <h3 className="font-heading font-bold uppercase tracking-wider text-xs">Media & Immagini</h3>
                </div>
                <div className="p-8 space-y-6">
-                  <div className="space-y-2">
-                    <Label>URL Immagine Principale</Label>
-                    <Input 
-                      placeholder="https://..." 
-                      className="h-12 rounded-xl" 
-                      onChange={(e) => setFormData({...formData, images: [e.target.value]})}
-                    />
+                  <div className="space-y-4">
+                    <Label>Carica Immagini (Seleziona un file OPPURE inserisci URL)</Label>
+                    <div className="flex flex-col lg:flex-row gap-4 lg:items-center">
+                        <Input 
+                            type="file" 
+                            accept="image/*"
+                            className="h-12 pt-2.5 rounded-xl file:mr-4 file:py-1 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 cursor-pointer" 
+                            onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                    const reader = new FileReader();
+                                    reader.onloadend = () => {
+                                        setFormData({...formData, images: [reader.result as string]});
+                                    };
+                                    reader.readAsDataURL(file);
+                                }
+                            }}
+                        />
+                        <span className="text-muted-foreground text-sm font-bold opacity-50 shrink-0">OPPURE</span>
+                        <Input 
+                          placeholder="https://... (URL Diretto)" 
+                          className="h-12 rounded-xl" 
+                          onChange={(e) => setFormData({...formData, images: [e.target.value]})}
+                        />
+                    </div>
                   </div>
-                  <p className="text-[10px] text-muted-foreground italic">Inserisci l'URL di un'immagine. In futuro potrai caricare file direttamente.</p>
+                  {formData.images[0] && (
+                     <div className="mt-4 p-4 border border-border/50 rounded-xl bg-secondary/10 inline-block shadow-sm">
+                        <p className="text-xs font-bold text-muted-foreground mb-3 uppercase tracking-wider">Anteprima Immagine</p>
+                        <img src={formData.images[0]} alt="Preview" className="h-40 w-auto object-contain rounded-lg" />
+                     </div>
+                  )}
                </div>
             </div>
 

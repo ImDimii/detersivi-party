@@ -1,0 +1,123 @@
+[
+  {
+    "name": "Blue Power Detergent - MixParty Dimi",
+    "slug": "blue-power-detergent",
+    "category_id": "dff21c68-6413-4040-831b-de069f553fed",
+    "sku": "DP-001",
+    "description_short": "Detersivo liquido universale per un pulito incredibile.",
+    "description_long": "Potenza blu extra concentrata per ogni tipo di tessuto.",
+    "price": 5.99,
+    "stock_quantity": 250,
+    "stock_alert_threshold": 20,
+    "status": "published",
+    "is_featured": true,
+    "is_new": true,
+    "images": ["/images/products/dimi_prodotto_1_1775081673813.png"]
+  },
+  {
+    "name": "Floor Green Clean - MixParty Dimi",
+    "slug": "floor-green-clean",
+    "category_id": "c62a2287-c6ce-4dd8-ad48-002387a85f8e",
+    "sku": "DP-002",
+    "description_short": "Lavapavimenti profumato al pino.",
+    "description_long": "Ideale per superfici in ceramica e legno.",
+    "price": 3.49,
+    "stock_quantity": 100,
+    "status": "published",
+    "is_featured": false,
+    "is_new": false,
+    "images": ["/images/products/dimi_prodotto_2_1775081686980.png"]
+  },
+  {
+    "name": "Pink Softener - MixParty Dimi",
+    "slug": "pink-softener",
+    "category_id": "b416b38a-2a9c-4c3b-a06e-249fa2cc719f",
+    "sku": "DP-003",
+    "description_short": "Ammorbidente extra soffice e di lunga durata.",
+    "description_long": "Dona ai tuoi capi una morbidezza incredibile.",
+    "price": 4.50,
+    "stock_quantity": 150,
+    "status": "published",
+    "is_featured": true,
+    "is_new": true,
+    "images": ["/images/products/dimi_prodotto_3_1775081699707.png"]
+  },
+  {
+    "name": "Glass Sparkle - MixParty Dimi",
+    "slug": "glass-sparkle",
+    "category_id": "c62a2287-c6ce-4dd8-ad48-002387a85f8e",
+    "sku": "DP-004",
+    "description_short": "Detergente per vetri senza aloni.",
+    "price": 2.99,
+    "stock_quantity": 300,
+    "status": "published",
+    "images": ["/images/products/dimi_prodotto_4_1775081712136.png"]
+  },
+  {
+    "name": "Lemon Dish Soap - MixParty Dimi",
+    "slug": "lemon-dish-soap",
+    "category_id": "dff21c68-6413-4040-831b-de069f553fed",
+    "sku": "DP-005",
+    "description_short": "Potente sgrassatore piatti al limone.",
+    "price": 2.50,
+    "stock_quantity": 400,
+    "status": "published",
+    "images": ["/images/products/dimi_prodotto_5_1775081738377.png"]
+  },
+  {
+    "name": "Pure White Bleach - MixParty Dimi",
+    "slug": "pure-white-bleach",
+    "category_id": "dff21c68-6413-4040-831b-de069f553fed",
+    "sku": "DP-006",
+    "description_short": "Candeggina delicata igienizzante.",
+    "price": 1.99,
+    "stock_quantity": 200,
+    "status": "published",
+    "images": ["/images/products/dimi_prodotto_6_1775081752394.png"]
+  },
+  {
+    "name": "Color Pods - MixParty Dimi",
+    "slug": "color-pods",
+    "category_id": "b416b38a-2a9c-4c3b-a06e-249fa2cc719f",
+    "sku": "DP-007",
+    "description_short": "Capsule lavatrice multicolore 3-in-1.",
+    "price": 9.99,
+    "stock_quantity": 80,
+    "status": "published",
+    "is_featured": true,
+    "images": ["/images/products/dimi_prodotto_7_1775081768901.png"]
+  },
+  {
+    "name": "Orange Degreaser - MixParty Dimi",
+    "slug": "orange-degreaser",
+    "category_id": "c62a2287-c6ce-4dd8-ad48-002387a85f8e",
+    "sku": "DP-008",
+    "description_short": "Sgrassatore universale spray.",
+    "price": 3.99,
+    "stock_quantity": 120,
+    "status": "published",
+    "images": ["/images/products/dimi_prodotto_8_1775081782421.png"]
+  },
+  {
+    "name": "Wood Care Liquid - MixParty Dimi",
+    "slug": "wood-care-liquid",
+    "category_id": "c62a2287-c6ce-4dd8-ad48-002387a85f8e",
+    "sku": "DP-009",
+    "description_short": "Trattamento specifico per parquet.",
+    "price": 6.50,
+    "stock_quantity": 50,
+    "status": "published",
+    "images": ["/images/products/dimi_prodotto_9_1775081795490.png"]
+  },
+  {
+    "name": "Heavy Duty Black - MixParty Dimi",
+    "slug": "heavy-duty-black",
+    "category_id": "c62a2287-c6ce-4dd8-ad48-002387a85f8e",
+    "sku": "DP-010",
+    "description_short": "Detergente industriale concentrato.",
+    "price": 12.99,
+    "stock_quantity": 30,
+    "status": "published",
+    "images": ["/images/products/dimi_prodotto_10_1775081810851.png"]
+  }
+]

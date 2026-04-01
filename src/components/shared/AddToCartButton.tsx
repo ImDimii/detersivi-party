@@ -11,17 +11,25 @@ interface AddToCartButtonProps {
 }
 
 export function AddToCartButton({ product, disabled }: AddToCartButtonProps) {
-  const { addItem } = useCart()
+  const { addItem, items } = useCart()
+
+  const stock = product.stock_quantity ?? 0
+  const cartItem = items.find(i => i.id === product.id)
+  const cartQty = cartItem?.quantity ?? 0
+  const isOutOfStock = stock <= 0
+  const isMaxReached = cartQty >= stock
+
+  const isDisabled = disabled || isOutOfStock || isMaxReached
 
   return (
     <Button 
       size="lg" 
       className="flex-grow h-14 text-base font-bold shadow-xl active:scale-95 transition-transform" 
-      disabled={disabled}
+      disabled={isDisabled}
       onClick={() => addItem(product)}
     >
       <ShoppingCart className="w-5 h-5 mr-3" />
-      Aggiungi al Carrello
+      {isOutOfStock ? 'Esaurito' : isMaxReached ? 'Massimo raggiunto' : 'Aggiungi al Carrello'}
     </Button>
   )
 }

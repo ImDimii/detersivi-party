@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Detersivi MixParty",
+    "slug": "detersivi-mixparty",
+    "description": "Linea personalizzata esclusiva al top per la pulizia.",
+    "is_active": true,
+    "sort_order": 1,
+    "image_url": "/images/categories/cat_mixparty_detergents_1775082178954.png"
+  },
+  {
+    "name": "Superfici & Pavimenti",
+    "slug": "superfici-pavimenti",
+    "description": "Detersivi speciali e cura per pavimenti in ceramica e laminato.",
+    "is_active": true,
+    "sort_order": 2,
+    "image_url": "/images/categories/cat_surfaces_floors_1775082193059.png"
+  },
+  {
+    "name": "Cura del Bucato",
+    "slug": "cura-bucato",
+    "description": "Ammorbidenti e profumi da bucato per un tocco soffice e duraturo.",
+    "is_active": true,
+    "sort_order": 3,
+    "image_url": "/images/categories/cat_laundry_care_1775082206407.png"
+  }
+]

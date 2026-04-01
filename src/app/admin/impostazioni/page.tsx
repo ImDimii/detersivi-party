@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { 
   Settings, 
   MapPin, 
@@ -8,12 +8,17 @@ import {
   Mail, 
   Phone, 
   Globe, 
-  Save, 
-  Truck, 
-  Store,
-  Bell,
+  Save,
+  Truck,
   Palette,
-  Layout
+  Layout,
+  Server,
+  Bell,
+  Lock,
+  Instagram,
+  Facebook,
+  Music2, // For TikTok
+  MessageCircle // For WhatsApp
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -23,22 +28,30 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { useSettings } from "@/hooks/useSettings"
 import { useToast } from "@/hooks/useToast"
+import Link from 'next/link'
+import { Loader2 } from "lucide-react"
 
 export default function AdminSettingsPage() {
   const { getSettings, updateSetting } = useSettings()
   const settings = getSettings.data || {}
   const { addToast } = useToast()
   const [activeTab, setActiveTab] = useState("general")
+  
+  // Freeze initial configuration to prevent Base UI uncontrolled mutation warnings
+  const initialSettings = useRef(settings).current
 
   // State for complex settings
   const [openingHours, setOpeningHours] = useState<any>({})
   const [deliveryZones, setDeliveryZones] = useState<string[]>([])
   const [newCap, setNewCap] = useState("")
 
+  const stringifiedOpeningHours = JSON.stringify(settings.opening_hours)
+  const stringifiedDeliveryZones = JSON.stringify(settings.delivery_zones)
+
   useEffect(() => {
     if (settings.opening_hours) {
       setOpeningHours(settings.opening_hours)
-    } else {
+    } else if (Object.keys(settings).length > 0) {
       // Default opening hours if not set
       const defaults = {
         'Lunedì': { open: "09:00", close: "19:30", active: true },
@@ -55,7 +68,7 @@ export default function AdminSettingsPage() {
     if (settings.delivery_zones) {
       setDeliveryZones(settings.delivery_zones)
     }
-  }, [settings])
+  }, [stringifiedOpeningHours, stringifiedDeliveryZones])
 
   const handleSave = async (key: string, value: any) => {
     try {
@@ -89,6 +102,15 @@ export default function AdminSettingsPage() {
     handleSave('delivery_zones', updated)
   }
 
+  if (getSettings.isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 opacity-50 space-y-4">
+        <Loader2 className="w-10 h-10 animate-spin text-primary" />
+        <p className="font-bold text-muted-foreground animate-pulse">Recupero impostazioni dal server...</p>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -106,27 +128,54 @@ export default function AdminSettingsPage() {
         </Button>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-         <div className="bg-white p-1 rounded-2xl border border-border/50 shadow-sm overflow-hidden">
-            <TabsList className="bg-transparent h-14 w-full justify-start overflow-x-auto flex flex-nowrap scrollbar-hide py-1">
-               <TabsTrigger value="general" className="rounded-xl font-bold text-xs uppercase px-8 flex-shrink-0 data-[state=active]:bg-primary data-[state=active]:text-white flex items-center h-full">
-                  <Settings className="w-4 h-4 mr-2" /> Generale
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col lg:flex-row gap-8">
+         {/* Vertical Sidebar */}
+         <div className="w-full lg:w-64 flex-shrink-0">
+            <TabsList className="flex flex-col h-auto bg-transparent items-stretch space-y-2 p-0">
+               <TabsTrigger 
+                  value="general" 
+                  className="justify-start px-6 py-4 rounded-2xl data-[state=active]:bg-primary data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:hover:bg-secondary/20 font-bold transition-all shadow-sm"
+               >
+                  <Settings className="w-5 h-5 mr-3" /> Generale
                </TabsTrigger>
-               <TabsTrigger value="delivery" className="rounded-xl font-bold text-xs uppercase px-8 flex-shrink-0 data-[state=active]:bg-primary data-[state=active]:text-white flex items-center h-full">
-                  <Truck className="w-4 h-4 mr-2" /> Consegna & Ritiro
+               <TabsTrigger 
+                  value="delivery" 
+                  className="justify-start px-6 py-4 rounded-2xl data-[state=active]:bg-primary data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:hover:bg-secondary/20 font-bold transition-all shadow-sm"
+               >
+                  <Truck className="w-5 h-5 mr-3" /> Consegna
                </TabsTrigger>
-               <TabsTrigger value="appearance" className="rounded-xl font-bold text-xs uppercase px-8 flex-shrink-0 data-[state=active]:bg-primary data-[state=active]:text-white flex items-center h-full">
-                  <Palette className="w-4 h-4 mr-2" /> Aspetto
+               <TabsTrigger 
+                  value="appearance" 
+                  className="justify-start px-6 py-4 rounded-2xl data-[state=active]:bg-primary data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:hover:bg-secondary/20 font-bold transition-all shadow-sm"
+               >
+                  <Palette className="w-5 h-5 mr-3" /> Tema
                </TabsTrigger>
-               <TabsTrigger value="notifications" className="rounded-xl font-bold text-xs uppercase px-8 flex-shrink-0 data-[state=active]:bg-primary data-[state=active]:text-white flex items-center h-full">
-                  <Bell className="w-4 h-4 mr-2" /> Notifiche
+               <TabsTrigger 
+                  value="notifications" 
+                  className="justify-start px-6 py-4 rounded-2xl data-[state=active]:bg-primary data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:hover:bg-secondary/20 font-bold transition-all shadow-sm"
+               >
+                  <Bell className="w-5 h-5 mr-3" /> Notifiche
                </TabsTrigger>
+               
+               {/* Quick Info Widget moved below the sidebar for desktop */}
+               <div className="hidden lg:block mt-8 bg-indigo-600 rounded-3xl p-6 text-white space-y-6 shadow-xl relative overflow-hidden group border border-indigo-500">
+                  <div className="absolute -top-4 -right-4 p-4 opacity-10 group-hover:scale-125 transition-transform duration-500">
+                     <Layout className="w-32 h-32" />
+                  </div>
+                  <div className="space-y-2 relative z-10">
+                     <h4 className="text-xl font-heading font-extrabold uppercase tracking-tight">Guida Rapida</h4>
+                     <p className="text-xs text-indigo-100 leading-relaxed font-medium">Le modifiche qui hanno effetto immediato su tutto il sito.</p>
+                  </div>
+                  <Link href="/admin/documentazione" className="block relative z-10">
+                     <Button variant="secondary" className="w-full h-12 shadow-lg font-black uppercase text-[10px] tracking-widest cursor-pointer">Leggi Documentazione</Button>
+                  </Link>
+               </div>
             </TabsList>
          </div>
 
-         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-8">
-               <TabsContent value="general" className="mt-0 space-y-6">
+         {/* Content Area */}
+         <div className="flex-grow min-w-0">
+            <TabsContent value="general" className="mt-0 space-y-6">
                   <div className="bg-white rounded-3xl border border-border/50 shadow-sm overflow-hidden">
                      <div className="p-8 border-b bg-secondary/10">
                         <h3 className="font-heading font-bold flex items-center">
@@ -138,7 +187,7 @@ export default function AdminSettingsPage() {
                            <div className="space-y-2">
                               <Label>Nome Negozio</Label>
                               <Input 
-                                defaultValue={settings.shop_name || "DetersiviParty"} 
+                                defaultValue={initialSettings.shop_name || "DetersiviParty"} 
                                 onBlur={(e) => handleSave('shop_name', e.target.value)}
                                 className="h-12 rounded-xl" 
                               />
@@ -146,7 +195,7 @@ export default function AdminSettingsPage() {
                            <div className="space-y-2">
                               <Label>Partita IVA</Label>
                               <Input 
-                                defaultValue={settings.vat_number || "IT0123456789"} 
+                                defaultValue={initialSettings.vat_number || "IT0123456789"} 
                                 onBlur={(e) => handleSave('vat_number', e.target.value)}
                                 className="h-12 rounded-xl" 
                               />
@@ -158,7 +207,7 @@ export default function AdminSettingsPage() {
                              rows={3}
                              placeholder="Descrivi il tuo negozio..."
                              className="rounded-xl"
-                             defaultValue={settings.shop_description || "Il tuo punto di riferimento..."}
+                             defaultValue={initialSettings.shop_description || "Il tuo punto di riferimento..."}
                              onBlur={(e) => handleSave('shop_description', e.target.value)}
                            />
                         </div>
@@ -166,7 +215,7 @@ export default function AdminSettingsPage() {
                            <div className="space-y-2">
                               <Label>Email Contatto</Label>
                               <Input 
-                                defaultValue={settings.contact_email || "info@detersiviparty.it"} 
+                                defaultValue={initialSettings.contact_email || "info@detersiviparty.it"} 
                                 onBlur={(e) => handleSave('contact_email', e.target.value)}
                                 className="h-12 rounded-xl" 
                               />
@@ -174,7 +223,7 @@ export default function AdminSettingsPage() {
                            <div className="space-y-2">
                               <Label>Telefono</Label>
                               <Input 
-                                defaultValue={settings.contact_phone || "+39 0185 123456"} 
+                                defaultValue={initialSettings.contact_phone || "+39 0185 123456"} 
                                 onBlur={(e) => handleSave('contact_phone', e.target.value)}
                                 className="h-12 rounded-xl" 
                               />
@@ -183,10 +232,20 @@ export default function AdminSettingsPage() {
                         <div className="space-y-2">
                            <Label>Indirizzo Fisico</Label>
                            <Input 
-                             defaultValue={settings.shop_address || "Via Roma 123, 16038 Santa Margherita Ligure (GE)"} 
+                             defaultValue={initialSettings.shop_address || "Via Roma 123, 16038 Santa Margherita Ligure (GE)"} 
                              onBlur={(e) => handleSave('shop_address', e.target.value)}
                              className="h-12 rounded-xl" 
                            />
+                        </div>
+                        <div className="space-y-2 pt-4">
+                           <Label>Puntatore Mappa Preciso (Opzionale)</Label>
+                           <Input 
+                             defaultValue={initialSettings.map_embed_url || ""} 
+                             onBlur={(e) => handleSave('map_embed_url', e.target.value)}
+                             placeholder="Es: Via Milano 1, Palermo (oppure un URL Embed di Google Maps)"
+                             className="h-12 rounded-xl" 
+                           />
+                           <p className="text-[10px] font-bold text-muted-foreground uppercase">Se vuoto, il sistema posizionerà il pin /contatti usando l'Indirizzo Fisico specificato sopra.</p>
                         </div>
                      </div>
                   </div>
@@ -296,7 +355,7 @@ export default function AdminSettingsPage() {
                                   onBlur={(e) => handleSave('primary_color', e.target.value)}
                                   className="h-12 rounded-xl font-mono" 
                                 />
-                                <div className="w-12 h-12 rounded-xl border" style={{ backgroundColor: settings.primary_color || "#4f46e5" }} />
+                                <div className="w-12 h-12 rounded-xl border flex-shrink-0" style={{ backgroundColor: settings.primary_color || "#4f46e5" }} />
                               </div>
                            </div>
                            <div className="space-y-2">
@@ -308,6 +367,57 @@ export default function AdminSettingsPage() {
                                   onCheckedChange={(v) => handleSave('dark_mode', v.toString())} 
                                 />
                               </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+
+                  {/* SOCIAL MEDIA SETTINGS */}
+                  <div className="bg-white rounded-3xl border border-border/50 shadow-sm overflow-hidden mt-8">
+                     <div className="p-8 border-b bg-secondary/10">
+                        <h3 className="font-heading font-bold flex items-center">
+                           <Instagram className="w-5 h-5 mr-3 text-pink-500" /> Profili Social
+                        </h3>
+                     </div>
+                     <div className="p-8 space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                           <div className="space-y-2">
+                              <Label className="flex items-center"><Instagram className="w-4 h-4 mr-2" /> Instagram URL</Label>
+                              <Input 
+                                defaultValue={settings.social_instagram || ""} 
+                                onBlur={(e) => handleSave('social_instagram', e.target.value)}
+                                className="h-12 rounded-xl" 
+                                placeholder="https://instagram.com/tuoprofilo"
+                              />
+                           </div>
+                           <div className="space-y-2">
+                              <Label className="flex items-center"><Facebook className="w-4 h-4 mr-2" /> Facebook URL</Label>
+                              <Input 
+                                defaultValue={settings.social_facebook || ""} 
+                                onBlur={(e) => handleSave('social_facebook', e.target.value)}
+                                className="h-12 rounded-xl" 
+                                placeholder="https://facebook.com/tuoprofilo"
+                              />
+                           </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                           <div className="space-y-2">
+                              <Label className="flex items-center"><Music2 className="w-4 h-4 mr-2" /> TikTok URL</Label>
+                              <Input 
+                                defaultValue={settings.social_tiktok || ""} 
+                                onBlur={(e) => handleSave('social_tiktok', e.target.value)}
+                                className="h-12 rounded-xl" 
+                                placeholder="https://tiktok.com/@tuoprofilo"
+                              />
+                           </div>
+                           <div className="space-y-2">
+                              <Label className="flex items-center"><MessageCircle className="w-4 h-4 mr-2 text-green-500" /> Numero WhatsApp (Con prefisso)</Label>
+                              <Input 
+                                defaultValue={settings.social_whatsapp || "+393001234567"} 
+                                onBlur={(e) => handleSave('social_whatsapp', e.target.value)}
+                                className="h-12 rounded-xl" 
+                                placeholder="es. +393001234567"
+                              />
                            </div>
                         </div>
                      </div>
@@ -340,39 +450,73 @@ export default function AdminSettingsPage() {
                         ))}
                      </div>
                   </div>
-               </TabsContent>
-            </div>
+                  <div className="bg-white rounded-3xl border border-border/50 shadow-sm overflow-hidden mt-8">
+                     <div className="p-8 border-b bg-secondary/10">
+                        <h3 className="font-heading font-bold flex items-center">
+                           <Server className="w-5 h-5 mr-3 text-primary" /> Configurazione SMTP
+                        </h3>
+                     </div>
+                     <div className="p-8 space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                           <div className="space-y-2">
+                              <Label>Host SMTP</Label>
+                              <Input 
+                                defaultValue={settings.smtp_host || "smtp.example.com"} 
+                                onBlur={(e) => handleSave('smtp_host', e.target.value)}
+                                className="h-12 rounded-xl" 
+                                placeholder="es. smtp.gmail.com"
+                              />
+                           </div>
+                           <div className="space-y-2">
+                              <Label>Porta SMTP</Label>
+                              <Input 
+                                type="number"
+                                defaultValue={settings.smtp_port || "587"} 
+                                onBlur={(e) => handleSave('smtp_port', e.target.value)}
+                                className="h-12 rounded-xl" 
+                              />
+                           </div>
+                        </div>
 
-            <aside className="space-y-8">
-               <div className="bg-indigo-600 rounded-3xl p-8 text-white space-y-6 shadow-xl relative overflow-hidden group">
-                  <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-125 transition-transform duration-500">
-                     <Layout className="w-32 h-32" />
-                  </div>
-                  <div className="space-y-2 relative z-10">
-                     <h4 className="text-xl font-heading font-extrabold uppercase tracking-tight">Guida Rapida</h4>
-                     <p className="text-sm text-indigo-100 leading-relaxed">Le impostazioni modificate qui avranno effetto immediato su tutto il sito, inclusi il calcolo dei costi di consegna e gli orari mostrati nel footer.</p>
-                  </div>
-                  <Button variant="secondary" className="w-full h-12 shadow-lg font-black uppercase text-[10px] tracking-widest relative z-10">Leggi Documentazione</Button>
-               </div>
-               
-               <div className="bg-white rounded-3xl border border-border/50 shadow-sm p-8 space-y-4">
-                  <p className="text-xs font-black uppercase tracking-widest text-muted-foreground">Stato Sistema</p>
-                  <div className="space-y-4">
-                     <div className="flex items-center justify-between">
-                        <span className="text-sm font-bold">API Supabase</span>
-                        <span className="h-2 w-2 rounded-full bg-success shadow-[0_0_8px_rgba(34,197,94,0.5)]"></span>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                           <div className="space-y-2">
+                              <Label>Username (Email)</Label>
+                              <Input 
+                                defaultValue={settings.smtp_user || ""} 
+                                onBlur={(e) => handleSave('smtp_user', e.target.value)}
+                                className="h-12 rounded-xl" 
+                                placeholder="La tua email"
+                              />
+                           </div>
+                           <div className="space-y-2">
+                              <Label>Password (App Password)</Label>
+                              <div className="relative">
+                                 <Lock className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                                 <Input 
+                                   type="password"
+                                   defaultValue={settings.smtp_pass || ""} 
+                                   onBlur={(e) => handleSave('smtp_pass', e.target.value)}
+                                   className="h-12 rounded-xl pl-10" 
+                                   placeholder="••••••••••••"
+                                 />
+                              </div>
+                           </div>
+                        </div>
+
+                        <div className="space-y-2 border-t pt-6 mt-6">
+                           <Label>Indirizzo Mittente (From)</Label>
+                           <Input 
+                             defaultValue={settings.smtp_from_email || "no-reply@detersiviparty.it"} 
+                             onBlur={(e) => handleSave('smtp_from_email', e.target.value)}
+                             className="h-12 rounded-xl" 
+                           />
+                           <p className="text-xs text-muted-foreground leading-relaxed mt-2">
+                              Questo è l'indirizzo che i tuoi clienti vedranno come mittente quando ricevono notifiche da parte del negozio.
+                           </p>
+                        </div>
                      </div>
-                     <div className="flex items-center justify-between">
-                        <span className="text-sm font-bold">Storage Immagini</span>
-                        <span className="h-2 w-2 rounded-full bg-success shadow-[0_0_8px_rgba(34,197,94,0.5)]"></span>
-                     </div>
-                     <div className="flex items-center justify-between">
-                        <span className="text-sm font-bold">Servizio Email</span>
-                        <span className="h-2 w-2 rounded-full bg-success shadow-[0_0_8px_rgba(34,197,94,0.5)]"></span>
-                     </div>
                   </div>
-               </div>
-            </aside>
+               </TabsContent>
          </div>
       </Tabs>
     </div>

@@ -11,11 +11,13 @@ import {
   Users, 
   Settings, 
   LogOut,
-  ChevronRight
+  ChevronRight,
+  MessageSquare
 } from "lucide-react"
 
 const adminLinks = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
+  { name: "Messaggi", href: "/admin/messaggi", icon: MessageSquare },
   { name: "Prodotti", href: "/admin/prodotti", icon: Package },
   { name: "Categorie", href: "/admin/categorie", icon: Tags },
   { name: "Ordini", href: "/admin/ordini", icon: ShoppingBag },

@@ -3,8 +3,13 @@
 import { Navbar } from "@/components/layout/Navbar"
 import { Footer } from "@/components/layout/Footer"
 import { Shield, Lock, Eye, FileText } from "lucide-react"
+import { useSettings } from "@/hooks/useSettings"
 
 export default function PrivacyPage() {
+  const { getSettings } = useSettings()
+  const settings = getSettings.data || {}
+  const shopName = settings.shop_name || "DetersiviParty"
+  const shopEmail = settings.contact_email || "info@detersiviparty.it"
   return (
     <main className="flex flex-col min-h-screen bg-background">
       <Navbar />
@@ -24,7 +29,7 @@ export default function PrivacyPage() {
                     <Eye className="w-5 h-5 text-primary" /> 1. Introduzione
                  </h2>
                  <p className="text-muted-foreground leading-relaxed">
-                    Benvenuti su DetersiviParty. La tua privacy è estremamente importante per noi. Questa politica spiega come raccogliamo, utilizziamo e proteggiamo i tuoi dati personali quando utilizzi il nostro sito web e i nostri servizi.
+                    Benvenuti su {shopName}. La tua privacy è estremamente importante per noi. Questa politica spiega come raccogliamo, utilizziamo e proteggiamo i tuoi dati personali quando utilizzi il nostro sito web e i nostri servizi.
                  </p>
               </section>
 
@@ -57,7 +62,7 @@ export default function PrivacyPage() {
                     <Shield className="w-5 h-5 text-primary" /> 4. I tuoi diritti
                  </h2>
                  <p className="text-muted-foreground leading-relaxed">
-                    In conformità con il GDPR (Regolamento UE 2016/679), hai il diritto di accedere, rettificare, cancellare o limitare il trattamento dei tuoi dati. Puoi esercitare questi diritti contattandoci direttamente a info@detersiviparty.it.
+                    In conformità con il GDPR (Regolamento UE 2016/679), hai il diritto di accedere, rettificare, cancellare o limitare il trattamento dei tuoi dati. Puoi esercitare questi diritti contattandoci direttamente a <span className="font-bold">{shopEmail}</span>.
                  </p>
               </section>
            </div>

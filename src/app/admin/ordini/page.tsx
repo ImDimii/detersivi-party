@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { 
   ShoppingBag, 
   Search, 
@@ -38,6 +39,7 @@ import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 
 export default function AdminOrdersPage() {
+  const router = useRouter()
   const { getOrders, updateOrderStatus } = useOrders()
   const { addToast } = useToast()
   const [search, setSearch] = useState("")
@@ -171,10 +173,17 @@ export default function AdminOrdersPage() {
                     </tr>
                  ))
               ) : filteredOrders.map((order) => (
-                <tr key={order.id} className="hover:bg-secondary/5 transition-colors group">
+                <tr key={order.id} className={`transition-colors group ${
+                  order.status === 'preparing' ? 'bg-amber-500/5 hover:bg-amber-500/10' :
+                  order.status === 'ready' ? 'bg-success/5 hover:bg-success/10' :
+                  order.status === 'delivering' ? 'bg-indigo-500/5 hover:bg-indigo-500/10' :
+                  order.status === 'completed' ? 'bg-secondary/50 grayscale-[0.5] hover:bg-secondary/70' :
+                  order.status === 'cancelled' ? 'bg-destructive/5 hover:bg-destructive/10 opacity-75' :
+                  'hover:bg-secondary/5'
+                }`}>
                   <td className="px-8 py-6">
                     <div className="space-y-1">
-                       <p className="font-bold">#{order.order_number}</p>
+                       <p className="font-bold">{order.order_number}</p>
                        <p className="text-[10px] text-muted-foreground uppercase font-bold">{new Date(order.created_at).toLocaleDateString('it-IT')}</p>
                     </div>
                   </td>
@@ -204,7 +213,10 @@ export default function AdminOrdersPage() {
                               <MoreVertical className="w-4 h-4" />
                            </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-56 rounded-xl p-2 bg-white border shadow-xl z-50">
-                           <DropdownMenuItem className="flex items-center p-3 cursor-pointer font-bold text-xs uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors">
+                           <DropdownMenuItem 
+                              onClick={() => router.push(`/ordine/conferma/${order.id}`)}
+                              className="flex items-center p-3 cursor-pointer font-bold text-xs uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors"
+                           >
                               <Eye className="w-3.5 h-3.5 mr-3" /> Vedi Dettagli
                            </DropdownMenuItem>
                            <DropdownMenuItem 

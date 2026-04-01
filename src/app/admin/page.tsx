@@ -92,7 +92,7 @@ export default function AdminDashboard() {
                               <ShoppingBag className="w-5 h-5 text-muted-foreground" />
                            </div>
                            <div>
-                              <p className="font-bold text-sm">Ordine #{order.order_number}</p>
+                              <p className="font-bold text-sm">Ordine {order.order_number}</p>
                               <p className="text-xs text-muted-foreground">{order.customer_name} • {new Date(order.created_at).toLocaleDateString()}</p>
                            </div>
                         </div>

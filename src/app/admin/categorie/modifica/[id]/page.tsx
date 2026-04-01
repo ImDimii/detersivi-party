@@ -36,7 +36,15 @@ export default function EditCategoryPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    slug: string;
+    parent_id: string | null;
+    description: string;
+    image_url: string;
+    is_active: boolean;
+    sort_order: number;
+  }>({
     name: "",
     slug: "",
     parent_id: "none",

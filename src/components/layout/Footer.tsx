@@ -14,6 +14,12 @@ export function Footer() {
   const contactEmail = settings.contact_email || "info@detersiviparty.it"
   const vatNumber = settings.vat_number || "0123456789"
   const shopDescription = settings.shop_description || "Il tuo punto di riferimento locale per l'igiene della casa e allestimenti party indimenticabili. Qualità e cortesia al tuo servizio."
+  
+  const defaultHours = {
+    'Lunedì': { open: "09:00", close: "19:30", active: true },
+    'Domenica': { open: "09:00", close: "19:30", active: false }
+  }
+  const hours = settings.opening_hours || defaultHours
 
   return (
     <footer className="bg-secondary/50 border-t pt-16 pb-8">
@@ -30,15 +36,21 @@ export function Footer() {
               {shopDescription}
             </p>
             <div className="flex space-x-4">
-              <Link href={settings.facebook_url || "#"} className="text-muted-foreground hover:text-primary transition-colors">
-                <Facebook className="w-5 h-5" />
-              </Link>
-              <Link href={settings.instagram_url || "#"} className="text-muted-foreground hover:text-primary transition-colors">
-                <Instagram className="w-5 h-5" />
-              </Link>
-              <Link href={settings.twitter_url || "#"} className="text-muted-foreground hover:text-primary transition-colors">
-                <Twitter className="w-5 h-5" />
-              </Link>
+              {settings.social_facebook && (
+                <Link href={settings.social_facebook} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
+                  <Facebook className="w-5 h-5" />
+                </Link>
+              )}
+              {settings.social_instagram && (
+                <Link href={settings.social_instagram} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
+                  <Instagram className="w-5 h-5" />
+                </Link>
+              )}
+              {settings.social_tiktok && (
+                <Link href={settings.social_tiktok} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors flex items-center justify-center font-bold">
+                  <span>TikTok</span>
+                </Link>
+              )}
             </div>
           </div>
 
@@ -96,9 +108,9 @@ export function Footer() {
                 <Clock className="w-5 h-5 text-primary shrink-0" />
                 <div>
                   <p className="font-medium text-foreground">Lun - Sab</p>
-                  <p>{settings.hours_standard || "09:00 - 13:00 / 16:00 - 20:00"}</p>
+                  <p>{hours['Lunedì']?.active ? `${hours['Lunedì'].open} - ${hours['Lunedì'].close}` : "Chiuso"}</p>
                   <p className="mt-2 font-medium text-foreground">Domenica</p>
-                  <p>{settings.hours_sunday || "Chiuso"}</p>
+                  <p className={hours['Domenica']?.active ? "" : "text-destructive"}>{hours['Domenica']?.active ? `${hours['Domenica'].open} - ${hours['Domenica'].close}` : "Chiuso"}</p>
                 </div>
               </li>
             </ul>

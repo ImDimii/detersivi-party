@@ -1,6 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useParams } from "next/navigation"
+import Link from "next/link"
 import { Navbar } from "@/components/layout/Navbar"
 import { Footer } from "@/components/layout/Footer"
 import { ProductPreview } from "@/components/shared/ProductPreview"
@@ -8,23 +10,31 @@ import { useProducts } from "@/hooks/useProducts"
 import { useCategories } from "@/hooks/useCategories"
 import { Input } from "@/components/ui/input"
 import { Search, Filter, SlidersHorizontal, ChevronDown } from "lucide-react"
+import { Button, buttonVariants } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu"
-import { Button, buttonVariants } from "@/components/ui/button"
-import Link from "next/link"
-import { cn } from "@/lib/utils"
 
-export default function CatalogPage() {
+export default function DynamicCatalogPage() {
+  const params = useParams()
+  const routeCategorySlug = params?.categoria as string | undefined
+
   const [search, setSearch] = useState("")
-  const [categorySlug, setCategorySlug] = useState<string | undefined>(undefined)
+  const [categorySlug, setCategorySlug] = useState<string | undefined>(routeCategorySlug)
   const [maxPrice, setMaxPrice] = useState<number>(100)
+
+  // Resync if route changes
+  useEffect(() => {
+     if (routeCategorySlug) setCategorySlug(routeCategorySlug)
+  }, [routeCategorySlug])
+  
   const [sortBy, setSortBy] = useState<'price' | 'name' | 'created_at'>('created_at')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
-  
+
   const { data: categories } = useCategories()
   const { data: products, isLoading } = useProducts({ 
     search, 
@@ -43,6 +53,8 @@ export default function CatalogPage() {
     return "Ordina per"
   }
 
+  const currentCategory = categories?.find(c => c.slug === categorySlug)
+
   return (
     <main className="flex-grow bg-background">
       <Navbar />
@@ -52,8 +64,8 @@ export default function CatalogPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="space-y-2">
-               <h1 className="text-4xl font-heading font-extrabold tracking-tight">Il Nostro Catalogo</h1>
-               <p className="text-muted-foreground">Sfoglia tra oltre {products?.length || 0} prodotti disponibili per la tua casa e i tuoi party.</p>
+               <h1 className="text-4xl font-heading font-extrabold tracking-tight">{currentCategory ? currentCategory.name : "Il Nostro Catalogo"}</h1>
+               <p className="text-muted-foreground">{currentCategory?.description || `Sfoglia tra oltre ${products?.length || 0} prodotti disponibili per la tua casa e i tuoi party.`}</p>
             </div>
             
             <div className="relative max-w-md w-full">
@@ -85,7 +97,7 @@ export default function CatalogPage() {
                   className="justify-start font-medium"
                   onClick={() => {
                      setCategorySlug(undefined)
-                     window.history.pushState({}, '', '/catalogo')
+                     window.history.pushState({}, '', '/catalogo') // Update URL cosmetically
                   }}
                 >
                   Tutte le Categorie

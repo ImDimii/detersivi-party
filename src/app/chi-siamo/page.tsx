@@ -6,8 +6,12 @@ import { Button } from "@/components/ui/button"
 import { Sparkles, Heart, ShieldCheck, Users, ArrowRight, ShoppingBag } from "lucide-react"
 import { motion } from "framer-motion"
 import Link from "next/link"
+import { useSettings } from "@/hooks/useSettings"
 
 export default function ChiSiamoPage() {
+  const { getSettings } = useSettings()
+  const settings = getSettings.data || {}
+  const shopDescription = settings.shop_description || "Da semplice negozio di quartiere a punto di riferimento per l'igiene della casa e gli eventi più belli. Ecco chi siamo e perché amiamo quello che facciamo."
   return (
     <main className="flex flex-col min-h-screen bg-background text-foreground transition-colors duration-300">
       <Navbar />
@@ -40,8 +44,7 @@ export default function ChiSiamoPage() {
            </h2>
            
            <p className="text-xl text-muted-foreground max-w-3xl mx-auto font-medium leading-relaxed">
-             Da semplice negozio di quartiere a punto di riferimento per l'igiene della casa e gli eventi più belli. 
-             Ecco chi siamo e perché amiamo quello che facciamo.
+             {shopDescription}
            </p>
         </section>
 
