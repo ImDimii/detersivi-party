@@ -55,10 +55,12 @@ export function useReservations(filters: { status?: string, userId?: string } = 
       const randomPart = Math.floor(1000 + Math.random() * 9000)
       const datePart = new Date().toISOString().slice(2, 10).replace(/-/g, '')
       const reservationNumber = `RES-${datePart}-${randomPart}`
+      const id = crypto.randomUUID()
 
       const { error } = await supabase
         .from('reservations')
         .insert([{
+          id,
           ...newReservation,
           user_id: authUser?.id ?? null,
           reservation_number: reservationNumber,
@@ -72,6 +74,7 @@ export function useReservations(filters: { status?: string, userId?: string } = 
         throw new Error(error.message || error.code || JSON.stringify(error))
       }
       return { 
+         id,
          ...newReservation, 
          reservation_number: reservationNumber, 
          user_id: authUser?.id ?? null 
