@@ -89,7 +89,7 @@ export default function AdminProductsPage() {
     <div className="space-y-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-2">
-           <h1 className="text-4xl font-heading font-extrabold tracking-tight">Gestione Prodotti</h1>
+           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-heading font-extrabold tracking-tight">Gestione Prodotti</h1>
            <p className="text-muted-foreground">Visualizza, aggiungi e modifica l'inventario del tuo negozio.</p>
         </div>
         <Link href="/admin/prodotti/nuovo">

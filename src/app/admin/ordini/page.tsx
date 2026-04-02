@@ -108,7 +108,7 @@ export default function AdminOrdersPage() {
     <div className="space-y-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-2">
-           <h1 className="text-4xl font-heading font-extrabold tracking-tight">Ordini</h1>
+           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-heading font-extrabold tracking-tight">Ordini</h1>
            <p className="text-muted-foreground">Gestisci le vendite e traccia lo stato della preparazione.</p>
         </div>
         <Button variant="outline" size="lg" className="h-14 px-8 font-bold rounded-xl border-2">

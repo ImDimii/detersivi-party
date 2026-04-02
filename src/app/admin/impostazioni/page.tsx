@@ -115,7 +115,7 @@ export default function AdminSettingsPage() {
     <div className="space-y-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-2">
-           <h1 className="text-4xl font-heading font-extrabold tracking-tight">Impostazioni</h1>
+           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-heading font-extrabold tracking-tight">Impostazioni</h1>
            <p className="text-muted-foreground">Configura i parametri del negozio, le modalità di consegna e gli orari.</p>
         </div>
         <Button 
@@ -131,28 +131,28 @@ export default function AdminSettingsPage() {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col lg:flex-row gap-8">
          {/* Vertical Sidebar */}
          <div className="w-full lg:w-64 flex-shrink-0">
-            <TabsList className="flex flex-col h-auto bg-transparent items-stretch space-y-2 p-0">
+            <TabsList className="flex flex-row lg:flex-col h-auto bg-transparent items-stretch gap-2 p-0 overflow-x-auto pb-2 lg:pb-0 lg:overflow-x-visible">
                <TabsTrigger 
                   value="general" 
-                  className="justify-start px-6 py-4 rounded-2xl data-[state=active]:bg-primary data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:hover:bg-secondary/20 font-bold transition-all shadow-sm"
+                  className="justify-start px-4 lg:px-6 py-3 lg:py-4 rounded-2xl data-[state=active]:bg-primary data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:hover:bg-secondary/20 font-bold transition-all shadow-sm whitespace-nowrap text-xs lg:text-sm"
                >
                   <Settings className="w-5 h-5 mr-3" /> Generale
                </TabsTrigger>
                <TabsTrigger 
                   value="delivery" 
-                  className="justify-start px-6 py-4 rounded-2xl data-[state=active]:bg-primary data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:hover:bg-secondary/20 font-bold transition-all shadow-sm"
+                  className="justify-start px-4 lg:px-6 py-3 lg:py-4 rounded-2xl data-[state=active]:bg-primary data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:hover:bg-secondary/20 font-bold transition-all shadow-sm whitespace-nowrap text-xs lg:text-sm"
                >
                   <Truck className="w-5 h-5 mr-3" /> Consegna
                </TabsTrigger>
                <TabsTrigger 
                   value="appearance" 
-                  className="justify-start px-6 py-4 rounded-2xl data-[state=active]:bg-primary data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:hover:bg-secondary/20 font-bold transition-all shadow-sm"
+                  className="justify-start px-4 lg:px-6 py-3 lg:py-4 rounded-2xl data-[state=active]:bg-primary data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:hover:bg-secondary/20 font-bold transition-all shadow-sm whitespace-nowrap text-xs lg:text-sm"
                >
                   <Palette className="w-5 h-5 mr-3" /> Tema
                </TabsTrigger>
                <TabsTrigger 
                   value="notifications" 
-                  className="justify-start px-6 py-4 rounded-2xl data-[state=active]:bg-primary data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:hover:bg-secondary/20 font-bold transition-all shadow-sm"
+                  className="justify-start px-4 lg:px-6 py-3 lg:py-4 rounded-2xl data-[state=active]:bg-primary data-[state=active]:text-white data-[state=inactive]:bg-white data-[state=inactive]:border data-[state=inactive]:hover:bg-secondary/20 font-bold transition-all shadow-sm whitespace-nowrap text-xs lg:text-sm"
                >
                   <Bell className="w-5 h-5 mr-3" /> Notifiche
                </TabsTrigger>
@@ -258,20 +258,20 @@ export default function AdminSettingsPage() {
                      </div>
                      <div className="p-8 space-y-4">
                         {Object.entries(openingHours).map(([day, data]: [string, any]) => (
-                           <div key={day} className="flex items-center justify-between py-2 border-b last:border-0 border-border/30">
+                           <div key={day} className="flex flex-col sm:flex-row sm:items-center justify-between py-3 border-b last:border-0 border-border/30 gap-2">
                               <span className={`font-bold text-sm w-32 ${!data.active ? 'text-muted-foreground' : ''}`}>{day}</span>
-                              <div className="flex items-center space-x-4">
+                              <div className="flex items-center space-x-3 sm:space-x-4">
                                  <Input 
                                    value={data.open} 
                                    onChange={(e) => handleOpeningHoursChange(day, 'open', e.target.value)}
-                                   className="h-10 w-24 rounded-lg text-center font-bold" 
+                                   className="h-10 w-20 sm:w-24 rounded-lg text-center font-bold text-sm" 
                                    disabled={!data.active}
                                  />
                                  <span className="text-muted-foreground">-</span>
                                  <Input 
                                    value={data.close} 
                                    onChange={(e) => handleOpeningHoursChange(day, 'close', e.target.value)}
-                                   className="h-10 w-24 rounded-lg text-center font-bold" 
+                                   className="h-10 w-20 sm:w-24 rounded-lg text-center font-bold text-sm" 
                                    disabled={!data.active}
                                  />
                                  <Switch 

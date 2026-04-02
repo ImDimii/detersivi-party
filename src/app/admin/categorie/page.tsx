@@ -92,7 +92,7 @@ export default function AdminCategoriesPage() {
     <div className="space-y-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-2">
-           <h1 className="text-4xl font-heading font-extrabold tracking-tight">Categorie</h1>
+           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-heading font-extrabold tracking-tight">Categorie</h1>
            <p className="text-muted-foreground">Gestisci le categorie e sottocategorie per organizzare i tuoi prodotti.</p>
         </div>
         <Link href="/admin/categorie/nuova">

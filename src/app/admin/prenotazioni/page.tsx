@@ -102,7 +102,7 @@ export default function AdminReservationsPage() {
     <div className="space-y-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-2">
-           <h1 className="text-4xl font-heading font-extrabold tracking-tight">Prenotazioni</h1>
+           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-heading font-extrabold tracking-tight">Prenotazioni</h1>
            <p className="text-muted-foreground">Gestisci il calendario degli appuntamenti e degli allestimenti.</p>
         </div>
         <Tabs value={view} onValueChange={(v: any) => setView(v)} className="bg-white p-1 rounded-xl border border-border/50 shadow-sm h-14">
@@ -114,7 +114,7 @@ export default function AdminReservationsPage() {
       </div>
 
       {/* Stats Bar */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
          {stats.map((stat) => (
            <div key={stat.label} className="bg-white p-6 rounded-3xl border border-border/50 shadow-sm flex items-center space-x-4">
               <div className={`p-3 rounded-2xl ${stat.color} bg-current/10`}>

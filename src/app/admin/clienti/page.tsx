@@ -42,7 +42,7 @@ export default function AdminCustomersPage() {
     <div className="space-y-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-2">
-           <h1 className="text-4xl font-heading font-extrabold tracking-tight">Clienti</h1>
+           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-heading font-extrabold tracking-tight">Clienti</h1>
            <p className="text-muted-foreground">Gestisci i tuoi clienti registrati e visualizza le loro attività.</p>
         </div>
         <div className="flex gap-4">

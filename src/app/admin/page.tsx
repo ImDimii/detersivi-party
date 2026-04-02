@@ -44,21 +44,21 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-10">
-      <div className="flex justify-between items-end">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
         <div className="space-y-2">
-           <h1 className="text-4xl font-heading font-extrabold tracking-tight">Bentornato, Admin</h1>
-           <p className="text-muted-foreground">Ecco cosa è successo nel tuo negozio nelle ultime 24 ore.</p>
+           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-heading font-extrabold tracking-tight">Bentornato, Admin</h1>
+           <p className="text-sm sm:text-base text-muted-foreground">Ecco cosa è successo nel tuo negozio nelle ultime 24 ore.</p>
         </div>
-        <div className="bg-white px-4 py-2 rounded-xl border border-border/50 shadow-sm flex items-center space-x-2 text-sm font-bold">
+        <div className="bg-white px-4 py-2 rounded-xl border border-border/50 shadow-sm flex items-center space-x-2 text-sm font-bold self-start sm:self-auto shrink-0">
            <Clock className="w-4 h-4 text-primary" />
            <span>{new Date().toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
         </div>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         {stats.map((stat) => (
-          <div key={stat.name} className="bg-white p-6 rounded-3xl border border-border/50 shadow-sm space-y-4">
+          <div key={stat.name} className="bg-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-border/50 shadow-sm space-y-3 sm:space-y-4">
              <div className="flex justify-between items-start">
                 <div className={`p-3 rounded-2xl ${stat.bg} ${stat.color}`}>
                    <stat.icon className="w-6 h-6" />
@@ -69,8 +69,8 @@ export default function AdminDashboard() {
                 </div>
              </div>
              <div>
-                <p className="text-sm font-bold text-muted-foreground uppercase tracking-wider">{stat.name}</p>
-                <p className="text-3xl font-heading font-extrabold tracking-tight">{stat.value}</p>
+                 <p className="text-[10px] sm:text-sm font-bold text-muted-foreground uppercase tracking-wider">{stat.name}</p>
+                 <p className="text-xl sm:text-3xl font-heading font-extrabold tracking-tight">{stat.value}</p>
              </div>
           </div>
         ))}
