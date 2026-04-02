@@ -165,6 +165,15 @@ CREATE POLICY "Users view own orders" ON orders FOR SELECT USING (auth.uid() = u
 -- Reservations: Authenticated user read their own
 ALTER TABLE reservations ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users view own reservations" ON reservations FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Anyone can insert reservations" ON reservations FOR INSERT WITH CHECK (true);
+CREATE POLICY "Admin full access reservations" ON reservations FOR ALL USING (auth.jwt() ->> 'is_admin' = 'true');
+
+-- Other tables might need INSERT policies as well
+CREATE POLICY "Anyone can insert orders" ON orders FOR INSERT WITH CHECK (true);
+CREATE POLICY "Admin full access orders" ON orders FOR ALL USING (auth.jwt() ->> 'is_admin' = 'true');
+
+CREATE POLICY "Anyone can insert messages" ON messages FOR INSERT WITH CHECK (true);
+CREATE POLICY "Admin full access messages" ON messages FOR ALL USING (auth.jwt() ->> 'is_admin' = 'true');
 
 -- Admin role checks would go here (e.g., using a custom claim or a profiles table)
 
