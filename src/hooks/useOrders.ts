@@ -64,11 +64,10 @@ export function useOrders(filters: { status?: string, userId?: string } = {}) {
         throw new Error('Devi essere loggato per inviare un ordine. Per favore accedi e riprova.')
       }
 
-      // 1. Create order — sequential number starting from #2000
-      const { count: orderCount } = await supabase
-        .from('orders')
-        .select('*', { count: 'exact', head: true })
-      const orderNumber = `#${2000 + (orderCount ?? 0)}`
+      // 1. Create order — generate unique order number
+      const randomPart = Math.floor(1000 + Math.random() * 9000)
+      const datePart = new Date().toISOString().slice(2, 10).replace(/-/g, '')
+      const orderNumber = `#${datePart}-${randomPart}`
 
       const { data: orderResponse, error: orderError } = await supabase
         .from('orders')

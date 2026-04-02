@@ -51,29 +51,31 @@ export function useReservations(filters: { status?: string, userId?: string } = 
       // Get authenticated user (server-verified)
       const { data: { user: authUser } } = await supabase.auth.getUser()
 
-      // Generate sequential reservation number
-      const { count } = await supabase
-        .from('reservations')
-        .select('*', { count: 'exact', head: true })
-      const reservationNumber = `RES-${1000 + (count ?? 0)}`
+      // Generate a truly unique reservation number without relying on DB count (which fails due to SELECT RLS)
+      const randomPart = Math.floor(1000 + Math.random() * 9000)
+      const datePart = new Date().toISOString().slice(2, 10).replace(/-/g, '')
+      const reservationNumber = `RES-${datePart}-${randomPart}`
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('reservations')
         .insert([{
           ...newReservation,
           user_id: authUser?.id ?? null,
           reservation_number: reservationNumber,
         }])
-        .select()
       
       if (error) {
         console.error('[createReservation] Supabase error:', JSON.stringify(error), error.message, error.code)
         if (error.code === '42501') {
-          throw new Error('Permesso negato dal database (RLS). Per favore esegui le policy SQL indicate dall\'admin e riprova.')
+          throw new Error('Permesso negato dal database (RLS). Assicurati di aver eseguito le policy SQL (INSERT) nel pannello di Supabase!')
         }
         throw new Error(error.message || error.code || JSON.stringify(error))
       }
-      return data[0]
+      return { 
+         ...newReservation, 
+         reservation_number: reservationNumber, 
+         user_id: authUser?.id ?? null 
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reservations'] })
